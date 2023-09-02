@@ -9,8 +9,6 @@ services:
       dockerfile: docker/api/Dockerfile
     ports:
       - 8080:8080
-    volumes:
-      - ./app:/app
     depends_on:
       - db
     

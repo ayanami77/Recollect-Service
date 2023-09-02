@@ -3,7 +3,7 @@ ARG ALPINE_VERSION=3.18
 
 FROM golang:${GO_VERSION}-alpine${ALPINE_VERSION}
 
-WORKDIR /app
+WORKDIR /
 
 RUN apk update \
     && apk add --no-cache git \
@@ -11,7 +11,7 @@ RUN apk update \
 
 RUN go install github.com/cosmtrek/air@latest
 
-COPY app/go.mod .
-COPY app/go.sum .
+COPY go.mod .
+COPY /go.sum .
 
 RUN go mod download

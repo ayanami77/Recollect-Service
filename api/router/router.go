@@ -5,15 +5,15 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func setupRouter(userHandler user.Handler) *gin.Engine {
+func New(userHandler user.Handler) *gin.Engine {
 	router := gin.Default()
 
 	userRouter := router.Group("/user")
 	{
 		userRouter.GET("/:id", userHandler.GetUser)
 		userRouter.POST("/", userHandler.CreateUser)
-		userRouter.DELETE("/:id", userHandler.UpdateUser)
-		userRouter.PATCH("/:id", userHandler.DeleteUser)
+		userRouter.PATCH("/:id", userHandler.UpdateUser)
+		userRouter.DELETE("/:id", userHandler.DeleteUser)
 	}
 
 	return router

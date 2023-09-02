@@ -1,10 +1,11 @@
 package user
 
 import (
+	"net/http"
+
 	"github.com/Seiya-Tagami/Recollect-Service/api/domain/entity"
 	"github.com/Seiya-Tagami/Recollect-Service/api/usecase/user"
 	"github.com/gin-gonic/gin"
-	"net/http"
 )
 
 type Handler interface {
@@ -25,42 +26,42 @@ func New(userInteractor user.Interactor) Handler {
 func (h *handler) GetUser(c *gin.Context) {
 	id := c.Param("id")
 
-	result, err := h.userInteractor.GetUser(id)
+	user, err := h.userInteractor.GetUser(id)
 	if err != nil {
 		panic(err)
 	}
 
-	print(result)
+	c.JSON(http.StatusOK, gin.H{"data": user})
 }
 
 func (h *handler) CreateUser(c *gin.Context) {
-	user := entity.User{}
-	if err := c.BindJSON(&user); err != nil {
+	userReq := entity.User{}
+	if err := c.BindJSON(&userReq); err != nil {
 		panic(err)
 	}
 
-	result, err := h.userInteractor.CreateUser(user)
+	user, err := h.userInteractor.CreateUser(userReq)
 	if err != nil {
 		panic(err)
 	}
 
-	print(result)
+	c.JSON(http.StatusOK, gin.H{"data": user})
 }
 
 func (h *handler) UpdateUser(c *gin.Context) {
 	id := c.Param("id")
 
-	user := entity.User{}
-	if err := c.ShouldBindJSON(&user); err != nil {
+	userReq := entity.User{}
+	if err := c.BindJSON(&userReq); err != nil {
 		panic(err)
 	}
 
-	result, err := h.userInteractor.UpdateUser(user, id)
+	user, err := h.userInteractor.UpdateUser(userReq, id)
 	if err != nil {
 		panic(err)
 	}
 
-	print(result)
+	c.JSON(http.StatusOK, gin.H{"data": user})
 }
 
 func (h *handler) DeleteUser(c *gin.Context) {

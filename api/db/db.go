@@ -11,12 +11,12 @@ import (
 const (
 	host     = "db"
 	port     = 5432
-	user     = "example"
-	password = "example"
-	dbName   = "example"
+	user     = "reco_user"
+	password = "#reco#9Pup"
+	dbName   = "reco_db"
 )
 
-func NewDB() *gorm.DB {
+func New() *gorm.DB {
 	// TODO: .envをdockerで使えるようにしたい
 	// if os.Getenv("GO_ENV") == "dev" {
 	// 	err := godotenv.Load()
@@ -35,7 +35,7 @@ func NewDB() *gorm.DB {
 	return db
 }
 
-func CloseDB(db *gorm.DB) {
+func Close(db *gorm.DB) {
 	sqlDB, _ := db.DB()
 	if err := sqlDB.Close(); err != nil {
 		log.Fatalln(err)
