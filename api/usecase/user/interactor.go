@@ -3,6 +3,7 @@ package user
 import (
 	"github.com/Seiya-Tagami/Recollect-Service/api/domain/entity"
 	userRepository "github.com/Seiya-Tagami/Recollect-Service/api/domain/repository/user"
+	"github.com/go-playground/validator/v10"
 )
 
 type Interactor interface {
@@ -41,6 +42,13 @@ func (i *interactor) CreateUser(user entity.User) (entity.User, error) {
 }
 
 func (i *interactor) UpdateUser(user entity.User, id string) (entity.User, error) {
+	validate := validator.New()
+	//validate.RegisterValidation("includeNumeric", entity.IncludeAlphabetic)
+	//validate.RegisterValidation("includeAlphabetic", entity.IncludeNumeric)
+	if err := validate.Struct(user); err != nil {
+		return entity.User{}, err
+	}
+
 	if err := i.userRepository.UpdateById(&user, id); err != nil {
 		return entity.User{}, err
 	}

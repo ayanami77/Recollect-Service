@@ -18,16 +18,17 @@ func New(db *gorm.DB) user.Repository {
 }
 
 func (r *Repository) Insert(user *entity.User) error {
-	validate := validator.New()
-	validate.RegisterValidation("includeNumeric", entity.IncludeAlphabetic)
-	validate.RegisterValidation("includeAlphabetic", entity.IncludeNumeric)
-
-	if err := validate.Struct(user); err != nil {
-		return err
-	}
 	if len(user.UserName) == 0 {
 		user.UserName = user.UserID
 	}
+
+	validate := validator.New()
+	//validate.RegisterValidation("includeNumeric", entity.IncludeAlphabetic)
+	//validate.RegisterValidation("includeAlphabetic", entity.IncludeNumeric)
+	if err := validate.Struct(user); err != nil {
+		return err
+	}
+
 	if err := r.db.Create(user).Error; err != nil {
 		return err
 	}
