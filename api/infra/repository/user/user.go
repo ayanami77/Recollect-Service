@@ -45,6 +45,13 @@ func (r *Repository) SelectById(user *entity.User, id string) error {
 }
 
 func (r *Repository) UpdateById(user *entity.User, id string) error {
+	validate := validator.New()
+	//validate.RegisterValidation("includeNumeric", entity.IncludeAlphabetic)
+	//validate.RegisterValidation("includeAlphabetic", entity.IncludeNumeric)
+	if err := validate.Struct(user); err != nil {
+		return err
+	}
+
 	result := r.db.Model(user).Where("user_id = ?", id).Updates(user)
 	if result.Error != nil {
 		return result.Error
