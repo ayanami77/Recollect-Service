@@ -2,6 +2,7 @@ package user
 
 import (
 	"fmt"
+	"github.com/go-playground/validator/v10"
 
 	"github.com/Seiya-Tagami/Recollect-Service/api/domain/entity"
 	"github.com/Seiya-Tagami/Recollect-Service/api/domain/repository/user"
@@ -17,6 +18,17 @@ func New(db *gorm.DB) user.Repository {
 }
 
 func (r *Repository) Insert(user *entity.User) error {
+	if len(user.UserName) == 0 {
+		user.UserName = user.UserID
+	}
+
+	validate := validator.New()
+	//validate.RegisterValidation("includeNumeric", entity.IncludeAlphabetic)
+	//validate.RegisterValidation("includeAlphabetic", entity.IncludeNumeric)
+	if err := validate.Struct(user); err != nil {
+		return err
+	}
+
 	if err := r.db.Create(user).Error; err != nil {
 		return err
 	}
@@ -33,6 +45,13 @@ func (r *Repository) SelectById(user *entity.User, id string) error {
 }
 
 func (r *Repository) UpdateById(user *entity.User, id string) error {
+	validate := validator.New()
+	//validate.RegisterValidation("includeNumeric", entity.IncludeAlphabetic)
+	//validate.RegisterValidation("includeAlphabetic", entity.IncludeNumeric)
+	if err := validate.Struct(user); err != nil {
+		return err
+	}
+
 	result := r.db.Model(user).Where("user_id = ?", id).Updates(user)
 	if result.Error != nil {
 		return result.Error
