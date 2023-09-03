@@ -13,6 +13,8 @@ type Handler interface {
 	CreateUser(c *gin.Context)
 	UpdateUser(c *gin.Context)
 	DeleteUser(c *gin.Context)
+	LoginUser(c *gin.Context)
+	//LogoutUser(c *gin.Context)
 }
 
 type handler struct {
@@ -74,3 +76,18 @@ func (h *handler) DeleteUser(c *gin.Context) {
 
 	c.Status(http.StatusNoContent)
 }
+
+func (h *handler) LoginUser(c *gin.Context) {
+	id := c.Query("user_id")
+	password := c.Query("password")
+
+	user, err := h.userInteractor.LoginUser(id, password)
+
+	if err != nil {
+		panic(err)
+	}
+
+	c.JSON(http.StatusOK, gin.H{"data": user})
+}
+
+//func (h *handler) LogoutUser(c *gin.Context) {}
