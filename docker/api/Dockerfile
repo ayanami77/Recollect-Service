@@ -11,7 +11,7 @@ RUN apk update \
 
 RUN go install github.com/cosmtrek/air@latest
 
-COPY app/go.mod .
-COPY app/go.sum .
+COPY ./go.mod .
+COPY ./go.sum .
 
 RUN go mod download
