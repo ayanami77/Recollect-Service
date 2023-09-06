@@ -37,7 +37,7 @@ func (r *Repository) Insert(user *entity.User) error {
 }
 
 func (r *Repository) SelectById(user *entity.User, id string) error {
-	if err := r.db.Where("user_id = ?", id).Find(user).Error; err != nil {
+	if err := r.db.First(user, "user_id = ?", id).Error; err != nil {
 		return err
 	}
 
