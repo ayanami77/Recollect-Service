@@ -1,13 +1,14 @@
 package router
 
 import (
+	"github.com/Seiya-Tagami/Recollect-Service/api/handler/card"
 	"github.com/Seiya-Tagami/Recollect-Service/api/handler/user"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"time"
 )
 
-func New(userHandler user.Handler) *gin.Engine {
+func New(userHandler user.Handler, cardHandler card.Handler) *gin.Engine {
 	router := gin.Default()
 
 	setCors(router)
@@ -21,6 +22,15 @@ func New(userHandler user.Handler) *gin.Engine {
 		userRouter.POST("/signup", userHandler.CreateUser)
 		userRouter.POST("/login", userHandler.LoginUser)
 		//userRouter.GET("/logout", userHandler.LogoutUser)
+	}
+
+	cardRouter := router.Group("/card")
+	{
+		cardRouter.GET("/:id", cardHandler.GetCard)
+		//cardRouter.POST("/", cardHandler.CreateCard)
+		cardRouter.PATCH("/:id", cardHandler.UpdateCard)
+		cardRouter.DELETE("/:id", cardHandler.DeleteCard)
+		cardRouter.POST("/new", cardHandler.CreateCard)
 	}
 
 	return router
