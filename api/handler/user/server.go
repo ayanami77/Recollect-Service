@@ -41,7 +41,6 @@ func (h *handler) CreateUser(c *gin.Context) {
 	if err := c.BindJSON(&userReq); err != nil {
 		panic(err)
 	}
-
 	user, err := h.userInteractor.CreateUser(userReq)
 	if err != nil {
 		panic(err)
@@ -78,10 +77,12 @@ func (h *handler) DeleteUser(c *gin.Context) {
 }
 
 func (h *handler) LoginUser(c *gin.Context) {
-	id := c.Query("user_id")
-	password := c.Query("password")
+	userReq := entity.User{}
+	if err := c.BindJSON(&userReq); err != nil {
+		panic(err)
+	}
 
-	user, err := h.userInteractor.LoginUser(id, password)
+	user, err := h.userInteractor.LoginUser(userReq.UserID, userReq.Password)
 
 	if err != nil {
 		panic(err)
