@@ -1,12 +1,10 @@
 package card
 
 import (
-	"net/http"
-	"strconv"
-
 	"github.com/Seiya-Tagami/Recollect-Service/api/domain/entity"
 	"github.com/Seiya-Tagami/Recollect-Service/api/usecase/card"
 	"github.com/gin-gonic/gin"
+	"net/http"
 )
 
 type Handler interface {
@@ -25,14 +23,9 @@ func New(cardInteractor card.Interactor) Handler {
 }
 
 func (h *handler) GetCard(c *gin.Context) {
-	stringId := c.Param("id")
+	id := c.Param("id")
 
-	id, err := strconv.ParseUint(stringId, 10, 64)
-	if err != nil {
-		panic(err)
-	}
-
-	card, err := h.cardInteractor.GetCard(uint(id))
+	card, err := h.cardInteractor.GetCard(id)
 	if err != nil {
 		panic(err)
 	}
@@ -54,19 +47,14 @@ func (h *handler) CreateCard(c *gin.Context) {
 }
 
 func (h *handler) UpdateCard(c *gin.Context) {
-	stringId := c.Param("id")
-
-	id, err := strconv.ParseUint(stringId, 10, 64)
-	if err != nil {
-		panic(err)
-	}
+	id := c.Param("id")
 
 	cardReq := entity.Card{}
 	if err := c.BindJSON(&cardReq); err != nil {
 		panic(err)
 	}
 
-	card, err := h.cardInteractor.UpdateCard(cardReq, uint(id))
+	card, err := h.cardInteractor.UpdateCard(cardReq, id)
 	if err != nil {
 		panic(err)
 	}
@@ -75,14 +63,9 @@ func (h *handler) UpdateCard(c *gin.Context) {
 }
 
 func (h *handler) DeleteCard(c *gin.Context) {
-	stringId := c.Param("id")
+	id := c.Param("id")
 
-	id, err := strconv.ParseUint(stringId, 10, 64)
-	if err != nil {
-		panic(err)
-	}
-
-	err = h.cardInteractor.DeleteCard(uint(id))
+	err := h.cardInteractor.DeleteCard(id)
 	if err != nil {
 		panic(err)
 	}

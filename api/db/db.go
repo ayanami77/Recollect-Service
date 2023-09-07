@@ -25,12 +25,15 @@ func New() *gorm.DB {
 	// 	}
 	// }
 
-	// TODO:log.Fatalは強制終了で重いので、通常のerr等に書き換えたい
 	dsn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbName)
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
-		log.Fatalln(err)
+		panic(err)
 	}
+
+	// uuid-osspを使えるようにする
+	db.Exec(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp";`)
+
 	fmt.Println("Connected")
 	return db
 }

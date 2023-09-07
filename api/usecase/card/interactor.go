@@ -6,10 +6,10 @@ import (
 )
 
 type Interactor interface {
-	GetCard(id uint) (entity.Card, error)
+	GetCard(id string) (entity.Card, error)
 	CreateCard(card entity.Card) (entity.Card, error)
-	UpdateCard(card entity.Card, id uint) (entity.Card, error)
-	DeleteCard(id uint) error
+	UpdateCard(card entity.Card, id string) (entity.Card, error)
+	DeleteCard(id string) error
 }
 
 type interactor struct {
@@ -20,7 +20,7 @@ func New(cardRepository cardRepository.Repository) Interactor {
 	return &interactor{cardRepository}
 }
 
-func (i *interactor) GetCard(id uint) (entity.Card, error) {
+func (i *interactor) GetCard(id string) (entity.Card, error) {
 	card := entity.Card{}
 
 	err := i.cardRepository.SelectById(&card, id)
@@ -40,7 +40,7 @@ func (i *interactor) CreateCard(card entity.Card) (entity.Card, error) {
 	return card, nil
 }
 
-func (i *interactor) UpdateCard(card entity.Card, id uint) (entity.Card, error) {
+func (i *interactor) UpdateCard(card entity.Card, id string) (entity.Card, error) {
 	if err := i.cardRepository.UpdateById(&card, id); err != nil {
 		return entity.Card{}, err
 	}
@@ -48,7 +48,7 @@ func (i *interactor) UpdateCard(card entity.Card, id uint) (entity.Card, error) 
 	return card, nil
 }
 
-func (i *interactor) DeleteCard(id uint) error {
+func (i *interactor) DeleteCard(id string) error {
 	if err := i.cardRepository.DeleteById(id); err != nil {
 		return err
 	}

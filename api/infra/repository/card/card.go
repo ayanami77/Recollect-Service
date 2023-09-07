@@ -23,15 +23,16 @@ func (r *Repository) Insert(card *entity.Card) error {
 	return nil
 }
 
-func (r *Repository) SelectById(card *entity.Card, id uint) error {
-	if err := r.db.First(card, id).Error; err != nil {
+func (r *Repository) SelectById(card *entity.Card, id string) error {
+	//whereCard := entity.Card{CardID: id, UserID: card.UserID}
+	if err := r.db.Where("user_id = ?", card.UserID).Where("card_id = ?", id).First(card).Error; err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (r *Repository) UpdateById(card *entity.Card, id uint) error {
+func (r *Repository) UpdateById(card *entity.Card, id string) error {
 	result := r.db.Model(card).Where("card_id = ?", id).Updates(card)
 	if result.Error != nil {
 		return result.Error
@@ -42,7 +43,7 @@ func (r *Repository) UpdateById(card *entity.Card, id uint) error {
 	return nil
 }
 
-func (r *Repository) DeleteById(id uint) error {
+func (r *Repository) DeleteById(id string) error {
 	result := r.db.Delete(&entity.Card{}, id)
 	if result.Error != nil {
 		return result.Error
