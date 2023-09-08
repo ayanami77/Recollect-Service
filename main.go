@@ -3,9 +3,12 @@ package main
 import (
 	"github.com/Seiya-Tagami/Recollect-Service/api/db"
 	"github.com/Seiya-Tagami/Recollect-Service/api/domain/entity"
+	"github.com/Seiya-Tagami/Recollect-Service/api/handler/card"
 	"github.com/Seiya-Tagami/Recollect-Service/api/handler/user"
+	cardRepository "github.com/Seiya-Tagami/Recollect-Service/api/infra/repository/card"
 	userRepository "github.com/Seiya-Tagami/Recollect-Service/api/infra/repository/user"
 	"github.com/Seiya-Tagami/Recollect-Service/api/router"
+	cardUsecase "github.com/Seiya-Tagami/Recollect-Service/api/usecase/card"
 	userUsecase "github.com/Seiya-Tagami/Recollect-Service/api/usecase/user"
 )
 
@@ -13,11 +16,16 @@ func main() {
 	dbConn := db.New()
 	defer db.Close(dbConn)
 	dbConn.AutoMigrate(&entity.User{})
+	dbConn.AutoMigrate(&entity.Card{})
 
 	userRepository := userRepository.New(dbConn)
 	userUsecase := userUsecase.New(userRepository)
 	userHandler := user.New(userUsecase)
-	router := router.New(userHandler)
+	cardRepository := cardRepository.New(dbConn)
+	cardUsecase := cardUsecase.New(cardRepository)
+	cardHandler := card.New(cardUsecase)
+
+	router := router.New(userHandler, cardHandler)
 
 	router.Run()
 }
