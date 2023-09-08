@@ -48,6 +48,7 @@ func (h *handler) CreateCard(c *gin.Context) {
 	if err := c.BindJSON(&cardReq); err != nil {
 		panic(err)
 	}
+
 	card, err := h.cardInteractor.CreateCard(cardReq)
 	if err != nil {
 		panic(err)
