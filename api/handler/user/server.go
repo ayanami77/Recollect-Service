@@ -41,7 +41,7 @@ func (h *handler) CreateUser(c *gin.Context) {
 	if err := c.BindJSON(&userReq); err != nil {
 		panic(err)
 	}
-	
+
 	user, err := h.userInteractor.CreateUser(userReq)
 	if err != nil {
 		panic(err)
