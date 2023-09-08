@@ -24,8 +24,7 @@ func (r *Repository) Insert(card *entity.Card) error {
 }
 
 func (r *Repository) SelectById(card *entity.Card, id string) error {
-	//whereCard := entity.Card{CardID: id, UserID: card.UserID}
-	if err := r.db.Where("user_id = ?", card.UserID).Where("card_id = ?", id).First(card).Error; err != nil {
+	if err := r.db.First(card, "card_id = ?", id).Error; err != nil {
 		return err
 	}
 
@@ -44,7 +43,7 @@ func (r *Repository) UpdateById(card *entity.Card, id string) error {
 }
 
 func (r *Repository) DeleteById(id string) error {
-	result := r.db.Delete(&entity.Card{}, id)
+	result := r.db.Where("card_id = ?", id).Delete(&entity.Card{})
 	if result.Error != nil {
 		return result.Error
 	}

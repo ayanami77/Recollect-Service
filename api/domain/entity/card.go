@@ -3,8 +3,8 @@ package entity
 import "time"
 
 type Card struct {
-	UserID    string    `json:"user_id" gorm:"primaryKey"`
 	CardID    string    `json:"card_id" gorm:"primaryKey;size:255;default:uuid_generate_v4()"`
+	UserID    string    `json:"user_id" gorm:"not null;index"`
 	Period    string    `json:"period" gorm:"not null"`
 	Title     string    `json:"title" gorm:"not null"`
 	Content   string    `json:"content" gorm:""`
