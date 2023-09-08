@@ -7,6 +7,7 @@ import (
 
 type Interactor interface {
 	GetCard(id string) (entity.Card, error)
+	ListCards() ([]entity.Card, error)
 	CreateCard(card entity.Card) (entity.Card, error)
 	UpdateCard(card entity.Card, id string) (entity.Card, error)
 	DeleteCard(id string) error
@@ -29,6 +30,17 @@ func (i *interactor) GetCard(id string) (entity.Card, error) {
 	}
 
 	return card, nil
+}
+
+func (i *interactor) ListCards() ([]entity.Card, error) {
+	cards := []entity.Card{}
+
+	err := i.cardRepository.SelectAll(&cards)
+	if err != nil {
+		return []entity.Card{}, err
+	}
+
+	return cards, nil
 }
 
 func (i *interactor) CreateCard(card entity.Card) (entity.Card, error) {

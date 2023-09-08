@@ -9,6 +9,7 @@ import (
 
 type Handler interface {
 	GetCard(c *gin.Context)
+	ListCards(c *gin.Context)
 	CreateCard(c *gin.Context)
 	UpdateCard(c *gin.Context)
 	DeleteCard(c *gin.Context)
@@ -31,6 +32,15 @@ func (h *handler) GetCard(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"data": card})
+}
+
+func (h *handler) ListCards(c *gin.Context) {
+	cards, err := h.cardInteractor.ListCards()
+	if err != nil {
+		panic(err)
+	}
+
+	c.JSON(http.StatusOK, gin.H{"data": cards})
 }
 
 func (h *handler) CreateCard(c *gin.Context) {

@@ -23,6 +23,14 @@ func (r *Repository) Insert(card *entity.Card) error {
 	return nil
 }
 
+func (r *Repository) SelectAll(cards *[]entity.Card) error {
+	if err := r.db.Find(cards).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (r *Repository) SelectById(card *entity.Card, id string) error {
 	if err := r.db.First(card, "card_id = ?", id).Error; err != nil {
 		return err

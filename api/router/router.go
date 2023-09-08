@@ -16,7 +16,6 @@ func New(userHandler user.Handler, cardHandler card.Handler) *gin.Engine {
 	userRouter := router.Group("/user")
 	{
 		userRouter.GET("/:id", userHandler.GetUser)
-		//userRouter.POST("/", userHandler.CreateUser)
 		userRouter.PATCH("/:id", userHandler.UpdateUser)
 		userRouter.DELETE("/:id", userHandler.DeleteUser)
 		userRouter.POST("/signup", userHandler.CreateUser)
@@ -27,7 +26,7 @@ func New(userHandler user.Handler, cardHandler card.Handler) *gin.Engine {
 	cardRouter := router.Group("/card")
 	{
 		cardRouter.GET("/:id", cardHandler.GetCard)
-		//cardRouter.POST("/", cardHandler.CreateCard)
+		cardRouter.GET("/", cardHandler.ListCards)
 		cardRouter.PATCH("/:id", cardHandler.UpdateCard)
 		cardRouter.DELETE("/:id", cardHandler.DeleteCard)
 		cardRouter.POST("/new", cardHandler.CreateCard)
