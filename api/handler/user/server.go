@@ -13,6 +13,8 @@ type Handler interface {
 	CreateUser(c *gin.Context)
 	UpdateUser(c *gin.Context)
 	DeleteUser(c *gin.Context)
+	LoginUser(c *gin.Context)
+	//LogoutUser(c *gin.Context)
 }
 
 type handler struct {
@@ -39,7 +41,6 @@ func (h *handler) CreateUser(c *gin.Context) {
 	if err := c.BindJSON(&userReq); err != nil {
 		panic(err)
 	}
-
 	user, err := h.userInteractor.CreateUser(userReq)
 	if err != nil {
 		panic(err)
@@ -74,3 +75,20 @@ func (h *handler) DeleteUser(c *gin.Context) {
 
 	c.Status(http.StatusNoContent)
 }
+
+func (h *handler) LoginUser(c *gin.Context) {
+	userReq := entity.User{}
+	if err := c.BindJSON(&userReq); err != nil {
+		panic(err)
+	}
+
+	user, err := h.userInteractor.LoginUser(userReq.UserID, userReq.Password)
+
+	if err != nil {
+		panic(err)
+	}
+
+	c.JSON(http.StatusOK, gin.H{"data": user})
+}
+
+//func (h *handler) LogoutUser(c *gin.Context) {}
