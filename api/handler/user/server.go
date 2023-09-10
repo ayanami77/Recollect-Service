@@ -94,6 +94,8 @@ func (h *handler) LoginUser(c *gin.Context) {
 		panic(err)
 	}
 
+	c.SetSameSite(http.SameSiteNoneMode)
+
 	c.SetCookie("reco_cookie", tokenString, 3600, "/", os.Getenv("API_DOMAIN"), false, true)
 
 	c.Status(http.StatusNoContent)

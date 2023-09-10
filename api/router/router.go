@@ -11,7 +11,6 @@ import (
 func New(userHandler user.Handler, cardHandler card.Handler) *gin.Engine {
 	router := gin.Default()
 
-	//setCookieManager(router)
 	setCors(router)
 
 	userRouter := router.Group("/user")
@@ -45,19 +44,3 @@ func setCors(router *gin.Engine) {
 		MaxAge:           12 * time.Hour,
 	}))
 }
-
-//func setCookieManager(router *gin.Engine) {
-//	store := cookie.NewStore([]byte("secret"))
-//	router.Use(sessions.Sessions("mysession", store))
-//}
-
-//func setCsrf(router *gin.Engine) {
-//	router.Use(csrf.Middleware(csrf.Options{
-//		CookiePath:     "/",
-//		CookieDomain:   os.Getenv("API_DOMAIN"),
-//		CookieHTTPOnly: true,
-//		CookieSameSite: http.SameSiteNoneMode,
-//		// CookieSameSite: http.SameSiteDefaultMode,
-//		// CookieMaxAge: 60,
-//	}))
-//}
