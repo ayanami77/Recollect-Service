@@ -1,10 +1,8 @@
 package card
 
 import (
-	"fmt"
 	"github.com/Seiya-Tagami/Recollect-Service/api/domain/entity"
 	"github.com/Seiya-Tagami/Recollect-Service/api/usecase/card"
-	jwt "github.com/appleboy/gin-jwt/v2"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -37,11 +35,7 @@ func (h *handler) GetCard(c *gin.Context) {
 }
 
 func (h *handler) ListCards(c *gin.Context) {
-	claims := jwt.ExtractClaims(c)
-	userID := claims["user_id"]
-	fmt.Printf("User %v", userID)
-
-	cards, err := h.cardInteractor.ListCards(userID.(string))
+	cards, err := h.cardInteractor.ListCards()
 	if err != nil {
 		panic(err)
 	}
