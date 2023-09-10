@@ -94,13 +94,13 @@ func (h *handler) LoginUser(c *gin.Context) {
 		panic(err)
 	}
 
-	c.SetCookie("reco_cookie", tokenString, 3600, "/", os.Getenv("API_DOMAIN"), true, true)
+	c.SetCookie("reco_cookie", tokenString, 3600, "/", os.Getenv("API_DOMAIN"), false, true)
 
 	c.Status(http.StatusNoContent)
 }
 
 func (h *handler) LogoutUser(c *gin.Context) {
-	c.SetCookie("reco_cookie", "", 0, "/", os.Getenv("API_DOMAIN"), true, true)
+	c.SetCookie("reco_cookie", "", 0, "/", os.Getenv("API_DOMAIN"), false, true)
 
 	c.Status(http.StatusNoContent)
 }

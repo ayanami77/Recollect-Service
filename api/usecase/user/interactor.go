@@ -79,6 +79,7 @@ func (i *interactor) LoginUser(id string, password string) (string, error) {
 		"user_id": id,
 		"exp":     time.Now().Add(time.Hour * 24).Unix(),
 	})
+
 	tokenString, err := token.SignedString([]byte(os.Getenv("SECRET")))
 	if err != nil {
 		return "", err

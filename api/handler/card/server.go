@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"github.com/Seiya-Tagami/Recollect-Service/api/domain/entity"
 	"github.com/Seiya-Tagami/Recollect-Service/api/usecase/card"
-	jwt "github.com/appleboy/gin-jwt/v2"
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v5"
 	"net/http"
+	"os"
 )
 
 type Handler interface {
@@ -36,12 +37,31 @@ func (h *handler) GetCard(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"data": card})
 }
 
-func (h *handler) ListCards(c *gin.Context) {
-	claims := jwt.ExtractClaims(c)
-	userID := claims["user_id"]
-	fmt.Printf("User %v", userID)
+func ParseToken(tokenString string) (*jwt.Token, error) {
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+		}
+		return []byte(os.Getenv("SECRET_KEY")), nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	return token, nil
+}
 
-	cards, err := h.cardInteractor.ListCards(userID.(string))
+func (h *handler) ListCards(c *gin.Context) {
+	tokenString, err := c.Cookie("reco_cookie")
+	if err != nil {
+		panic(err)
+	}
+	token, err := ParseToken(tokenString)
+	var userID string
+	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		userID = claims["user_id"].(string)
+	}
+
+	cards, err := h.cardInteractor.ListCards(userID)
 	if err != nil {
 		panic(err)
 	}
@@ -50,10 +70,21 @@ func (h *handler) ListCards(c *gin.Context) {
 }
 
 func (h *handler) CreateCard(c *gin.Context) {
+	tokenString, err := c.Cookie("reco_cookie")
+	if err != nil {
+		panic(err)
+	}
+	token, err := ParseToken(tokenString)
+	var userID string
+	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		userID = claims["user_id"].(string)
+	}
+
 	cardReq := entity.Card{}
 	if err := c.BindJSON(&cardReq); err != nil {
 		panic(err)
 	}
+	cardReq.UserID = userID
 
 	card, err := h.cardInteractor.CreateCard(cardReq)
 	if err != nil {
