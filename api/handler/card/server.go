@@ -1,13 +1,12 @@
 package card
 
 import (
-	"fmt"
 	"github.com/Seiya-Tagami/Recollect-Service/api/domain/entity"
 	"github.com/Seiya-Tagami/Recollect-Service/api/usecase/card"
+	"github.com/Seiya-Tagami/Recollect-Service/api/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 	"net/http"
-	"os"
 )
 
 type Handler interface {
@@ -37,25 +36,12 @@ func (h *handler) GetCard(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"data": card})
 }
 
-func ParseToken(tokenString string) (*jwt.Token, error) {
-	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
-		}
-		return []byte(os.Getenv("SECRET_KEY")), nil
-	})
-	if err != nil {
-		return nil, err
-	}
-	return token, nil
-}
-
 func (h *handler) ListCards(c *gin.Context) {
 	tokenString, err := c.Cookie("reco_cookie")
 	if err != nil {
 		panic(err)
 	}
-	token, err := ParseToken(tokenString)
+	token, err := utils.ParseToken(tokenString)
 	var userID string
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		userID = claims["user_id"].(string)
@@ -74,7 +60,7 @@ func (h *handler) CreateCard(c *gin.Context) {
 	if err != nil {
 		panic(err)
 	}
-	token, err := ParseToken(tokenString)
+	token, err := utils.ParseToken(tokenString)
 	var userID string
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		userID = claims["user_id"].(string)
@@ -96,11 +82,23 @@ func (h *handler) CreateCard(c *gin.Context) {
 
 func (h *handler) UpdateCard(c *gin.Context) {
 	id := c.Param("id")
+	tokenString, err := c.Cookie("reco_cookie")
+	if err != nil {
+		panic(err)
+	}
+	token, err := utils.ParseToken(tokenString)
+	var userID string
+	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		userID = claims["user_id"].(string)
+	}
 
 	cardReq := entity.Card{}
 	if err := c.BindJSON(&cardReq); err != nil {
 		panic(err)
 	}
+
+	cardReq.CardID = id
+	cardReq.UserID = userID
 
 	card, err := h.cardInteractor.UpdateCard(cardReq, id)
 	if err != nil {
