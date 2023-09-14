@@ -2,45 +2,51 @@ package router
 
 import (
 	"github.com/Seiya-Tagami/Recollect-Service/api/handler/card"
+	"github.com/Seiya-Tagami/Recollect-Service/api/handler/health"
 	"github.com/Seiya-Tagami/Recollect-Service/api/handler/user"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"time"
 )
 
-func New(userHandler user.Handler, cardHandler card.Handler) *gin.Engine {
+func New(healthHandler health.Handler, userHandler user.Handler, cardHandler card.Handler) *gin.Engine {
 	router := gin.Default()
+	router.Use(cors.New(cors.Config{
+		AllowOrigins: []string{"http://localhost:3000"},
+		AllowMethods: []string{"GET", "POST", "PATCH", "PUT", "DELETE"},
+		AllowHeaders: []string{
+			"Access-Control-Allow-Origin",
+			"Access-Control-Allow-Credentials",
+			"Access-Control-Allow-Headers",
+			"Content-Type",
+			"Content-Length",
+			"Accept-Encoding",
+			"Authorization",
+		},
+		AllowCredentials: true,
+		MaxAge:           24 * time.Hour,
+	}))
 
-	setCors(router)
-
-	userRouter := router.Group("/user")
+	// TODO: このようにグルーピングしないと、どういうわけかcorsエラーになってしまう。。
+	apiRouter := router.Group("/api")
 	{
-		userRouter.GET("/:id", userHandler.GetUser)
-		userRouter.PATCH("/:id", userHandler.UpdateUser)
-		userRouter.DELETE("/:id", userHandler.DeleteUser)
-		userRouter.POST("/signup", userHandler.CreateUser)
-		userRouter.POST("/login", userHandler.LoginUser)
-		userRouter.POST("/logout", userHandler.LogoutUser)
-	}
+		// health check
+		apiRouter.GET("/health", healthHandler.Check)
 
-	cardRouter := router.Group("/card")
-	{
-		cardRouter.GET("/:id", cardHandler.GetCard)
-		cardRouter.GET("/", cardHandler.ListCards)
-		cardRouter.PATCH("/:id", cardHandler.UpdateCard)
-		cardRouter.DELETE("/:id", cardHandler.DeleteCard)
-		cardRouter.POST("/new", cardHandler.CreateCard)
+		// user
+		apiRouter.GET("/user/:id", userHandler.GetUser)
+		apiRouter.PATCH("/user/:id", userHandler.UpdateUser)
+		apiRouter.DELETE("/user/:id", userHandler.DeleteUser)
+		apiRouter.POST("/user/login", userHandler.LoginUser)
+		apiRouter.POST("/user/signup", userHandler.CreateUser)
+		apiRouter.POST("/user/logout", userHandler.LogoutUser)
+
+		// card
+		apiRouter.GET("/card", cardHandler.ListCards)
+		apiRouter.POST("/card/new", cardHandler.CreateCard)
+		apiRouter.PATCH("/card/:id", cardHandler.UpdateCard)
+		apiRouter.DELETE("/card/:id", cardHandler.DeleteCard)
 	}
 
 	return router
-}
-
-func setCors(router *gin.Engine) {
-	router.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://localhost:3000"},
-		AllowMethods:     []string{"GET", "POST", "PATCH", "PUT", "DELETE"},
-		AllowHeaders:     []string{"Content-Type"},
-		AllowCredentials: true,
-		MaxAge:           12 * time.Hour,
-	}))
 }

@@ -96,13 +96,16 @@ func (h *handler) LoginUser(c *gin.Context) {
 
 	c.SetSameSite(http.SameSiteNoneMode)
 
-	c.SetCookie("reco_cookie", tokenString, 3600, "/", os.Getenv("API_DOMAIN"), false, true)
+	// sameSite = Noneの時は、secure属性をつけてあげるようにする。
+	c.SetCookie("user_token", tokenString, 3600, "/", os.Getenv("API_DOMAIN"), true, true)
 
 	c.Status(http.StatusNoContent)
 }
 
 func (h *handler) LogoutUser(c *gin.Context) {
-	c.SetCookie("reco_cookie", "", 0, "/", os.Getenv("API_DOMAIN"), false, true)
+	c.SetSameSite(http.SameSiteNoneMode)
+
+	c.SetCookie("user_token", "", 0, "/", os.Getenv("API_DOMAIN"), true, true)
 
 	c.Status(http.StatusNoContent)
 }

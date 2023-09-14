@@ -37,7 +37,7 @@ func (h *handler) GetCard(c *gin.Context) {
 }
 
 func (h *handler) ListCards(c *gin.Context) {
-	tokenString, err := c.Cookie("reco_cookie")
+	tokenString, err := c.Cookie("user_token")
 	if err != nil {
 		panic(err)
 	}
@@ -56,7 +56,7 @@ func (h *handler) ListCards(c *gin.Context) {
 }
 
 func (h *handler) CreateCard(c *gin.Context) {
-	tokenString, err := c.Cookie("reco_cookie")
+	tokenString, err := c.Cookie("user_token")
 	if err != nil {
 		panic(err)
 	}
@@ -82,7 +82,7 @@ func (h *handler) CreateCard(c *gin.Context) {
 
 func (h *handler) UpdateCard(c *gin.Context) {
 	id := c.Param("id")
-	tokenString, err := c.Cookie("reco_cookie")
+	tokenString, err := c.Cookie("user_token")
 	if err != nil {
 		panic(err)
 	}
