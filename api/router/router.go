@@ -27,25 +27,22 @@ func New(healthHandler health.Handler, userHandler user.Handler, cardHandler car
 		MaxAge:           24 * time.Hour,
 	}))
 
-	// TODO: このようにグルーピングしないと、どういうわけかcorsエラーになってしまう。。
-	apiRouter := router.Group("/api")
+	userRouter := router.Group("/user")
 	{
-		// health check
-		apiRouter.GET("/health", healthHandler.Check)
+		userRouter.GET("/:id", userHandler.GetUser)
+		userRouter.PATCH("/:id", userHandler.UpdateUser)
+		userRouter.DELETE("/:id", userHandler.DeleteUser)
+		userRouter.POST("/login", userHandler.LoginUser)
+		userRouter.POST("/signup", userHandler.CreateUser)
+		userRouter.POST("/logout", userHandler.LogoutUser)
+	}
 
-		// user
-		apiRouter.GET("/user/:id", userHandler.GetUser)
-		apiRouter.PATCH("/user/:id", userHandler.UpdateUser)
-		apiRouter.DELETE("/user/:id", userHandler.DeleteUser)
-		apiRouter.POST("/user/login", userHandler.LoginUser)
-		apiRouter.POST("/user/signup", userHandler.CreateUser)
-		apiRouter.POST("/user/logout", userHandler.LogoutUser)
-
-		// card
-		apiRouter.GET("/card", cardHandler.ListCards)
-		apiRouter.POST("/card/new", cardHandler.CreateCard)
-		apiRouter.PATCH("/card/:id", cardHandler.UpdateCard)
-		apiRouter.DELETE("/card/:id", cardHandler.DeleteCard)
+	cardRouter := router.Group("/card")
+	{
+		cardRouter.GET("/list", cardHandler.ListCards)
+		cardRouter.POST("/new", cardHandler.CreateCard)
+		cardRouter.PATCH("/:id", cardHandler.UpdateCard)
+		cardRouter.DELETE("/:id", cardHandler.DeleteCard)
 	}
 
 	return router
