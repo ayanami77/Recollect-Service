@@ -89,7 +89,18 @@ func (h *handler) LoginUser(c *gin.Context) {
 		panic(err)
 	}
 
-	c.JSON(http.StatusOK, gin.H{"data": user})
+	c.SetSameSite(http.SameSiteNoneMode)
+
+	// sameSite = Noneの時は、secure属性をつけてあげるようにする。
+	c.SetCookie("user_token", tokenString, 3600, "/", os.Getenv("API_DOMAIN"), true, true)
+
+	c.Status(http.StatusNoContent)
 }
 
-//func (h *handler) LogoutUser(c *gin.Context) {}
+func (h *handler) LogoutUser(c *gin.Context) {
+	c.SetSameSite(http.SameSiteNoneMode)
+
+	c.SetCookie("user_token", "", 0, "/", os.Getenv("API_DOMAIN"), true, true)
+
+	c.Status(http.StatusNoContent)
+}

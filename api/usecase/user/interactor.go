@@ -69,7 +69,17 @@ func (i *interactor) LoginUser(id string, password string) (entity.User, error) 
 
 	if user.Password != password {
 		err = fmt.Errorf("password is not correct")
-		return entity.User{}, err
+		return "", err
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"user_id": id,
+		"exp":     time.Now().Add(time.Hour * 24).Unix(),
+	})
+
+	tokenString, err := token.SignedString([]byte(os.Getenv("SECRET")))
+	if err != nil {
+		return "", err
 	}
 
 	return user, nil

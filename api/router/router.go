@@ -2,45 +2,48 @@ package router
 
 import (
 	"github.com/Seiya-Tagami/Recollect-Service/api/handler/card"
+	"github.com/Seiya-Tagami/Recollect-Service/api/handler/health"
 	"github.com/Seiya-Tagami/Recollect-Service/api/handler/user"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"time"
 )
 
-func New(userHandler user.Handler, cardHandler card.Handler) *gin.Engine {
+func New(healthHandler health.Handler, userHandler user.Handler, cardHandler card.Handler) *gin.Engine {
 	router := gin.Default()
-
-	setCors(router)
+	router.Use(cors.New(cors.Config{
+		AllowOrigins: []string{"http://localhost:3000"},
+		AllowMethods: []string{"GET", "POST", "PATCH", "PUT", "DELETE"},
+		AllowHeaders: []string{
+			"Access-Control-Allow-Origin",
+			"Access-Control-Allow-Credentials",
+			"Access-Control-Allow-Headers",
+			"Content-Type",
+			"Content-Length",
+			"Accept-Encoding",
+			"Authorization",
+		},
+		AllowCredentials: true,
+		MaxAge:           24 * time.Hour,
+	}))
 
 	userRouter := router.Group("/user")
 	{
 		userRouter.GET("/:id", userHandler.GetUser)
 		userRouter.PATCH("/:id", userHandler.UpdateUser)
 		userRouter.DELETE("/:id", userHandler.DeleteUser)
-		userRouter.POST("/signup", userHandler.CreateUser)
 		userRouter.POST("/login", userHandler.LoginUser)
-		//userRouter.GET("/logout", userHandler.LogoutUser)
+		userRouter.POST("/signup", userHandler.CreateUser)
+		userRouter.POST("/logout", userHandler.LogoutUser)
 	}
 
 	cardRouter := router.Group("/card")
 	{
-		cardRouter.GET("/:id", cardHandler.GetCard)
-		cardRouter.GET("/", cardHandler.ListCards)
+		cardRouter.GET("/list", cardHandler.ListCards)
+		cardRouter.POST("/new", cardHandler.CreateCard)
 		cardRouter.PATCH("/:id", cardHandler.UpdateCard)
 		cardRouter.DELETE("/:id", cardHandler.DeleteCard)
-		cardRouter.POST("/new", cardHandler.CreateCard)
 	}
 
 	return router
-}
-
-func setCors(router *gin.Engine) {
-	router.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://localhost:3000"},
-		AllowMethods:     []string{"GET", "POST", "PATCH", "PUT", "DELETE"},
-		AllowHeaders:     []string{"Content-Type"},
-		AllowCredentials: true,
-		MaxAge:           12 * time.Hour,
-	}))
 }
