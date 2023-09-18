@@ -16,5 +16,5 @@ type Card struct {
 	CreatedAt      time.Time      `json:"created_at" gorm:"not null"`
 	UpdatedAt      time.Time      `json:"updated_at" gorm:"not null"`
 	DeletedAt      time.Time      `json:"deleted_at" gorm:""`
-	User           User           `gorm:"references:UserID"`
+	User           User           `gorm:"references:UserID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 }

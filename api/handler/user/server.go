@@ -1,7 +1,10 @@
 package user
 
 import (
+	"fmt"
+	"github.com/gin-contrib/sessions"
 	"net/http"
+	"os"
 
 	"github.com/Seiya-Tagami/Recollect-Service/api/domain/entity"
 	"github.com/Seiya-Tagami/Recollect-Service/api/usecase/user"
@@ -14,7 +17,7 @@ type Handler interface {
 	UpdateUser(c *gin.Context)
 	DeleteUser(c *gin.Context)
 	LoginUser(c *gin.Context)
-	//LogoutUser(c *gin.Context)
+	LogoutUser(c *gin.Context)
 }
 
 type handler struct {
@@ -63,6 +66,9 @@ func (h *handler) UpdateUser(c *gin.Context) {
 		panic(err)
 	}
 
+	session := sessions.Default(c)
+	fmt.Printf("Session: %s\n", session.Get("user_id"))
+
 	c.JSON(http.StatusOK, gin.H{"data": user})
 }
 
@@ -83,8 +89,7 @@ func (h *handler) LoginUser(c *gin.Context) {
 		panic(err)
 	}
 
-	user, err := h.userInteractor.LoginUser(userReq.UserID, userReq.Password)
-
+	tokenString, err := h.userInteractor.LoginUser(userReq.UserID, userReq.Password)
 	if err != nil {
 		panic(err)
 	}
