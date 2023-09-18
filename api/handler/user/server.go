@@ -1,8 +1,6 @@
 package user
 
 import (
-	"fmt"
-	"github.com/gin-contrib/sessions"
 	"net/http"
 	"os"
 
@@ -65,9 +63,6 @@ func (h *handler) UpdateUser(c *gin.Context) {
 	if err != nil {
 		panic(err)
 	}
-
-	session := sessions.Default(c)
-	fmt.Printf("Session: %s\n", session.Get("user_id"))
 
 	c.JSON(http.StatusOK, gin.H{"data": user})
 }
