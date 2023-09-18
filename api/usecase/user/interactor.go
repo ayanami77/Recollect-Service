@@ -4,6 +4,9 @@ import (
 	"fmt"
 	"github.com/Seiya-Tagami/Recollect-Service/api/domain/entity"
 	userRepository "github.com/Seiya-Tagami/Recollect-Service/api/domain/repository/user"
+	"github.com/golang-jwt/jwt/v5"
+	"os"
+	"time"
 )
 
 type Interactor interface {
@@ -11,7 +14,7 @@ type Interactor interface {
 	CreateUser(user entity.User) (entity.User, error)
 	UpdateUser(user entity.User, id string) (entity.User, error)
 	DeleteUser(id string) error
-	LoginUser(id string, password string) (entity.User, error)
+	LoginUser(id string, password string) (string, error)
 	//LogoutUser(id string) (entity.User, error)
 }
 
@@ -59,12 +62,12 @@ func (i *interactor) DeleteUser(id string) error {
 	return nil
 }
 
-func (i *interactor) LoginUser(id string, password string) (entity.User, error) {
+func (i *interactor) LoginUser(id string, password string) (string, error) {
 	user := entity.User{}
 
 	err := i.userRepository.SelectById(&user, id)
 	if err != nil {
-		return entity.User{}, err
+		return "", err
 	}
 
 	if user.Password != password {
@@ -82,7 +85,7 @@ func (i *interactor) LoginUser(id string, password string) (entity.User, error) 
 		return "", err
 	}
 
-	return user, nil
+	return tokenString, nil
 }
 
 //func (i *interactor) LogoutUser(id string) (entity.User, error) {}
