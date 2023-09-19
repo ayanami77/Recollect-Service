@@ -10,7 +10,6 @@ import (
 )
 
 type Handler interface {
-	GetCard(c *gin.Context)
 	ListCards(c *gin.Context)
 	CreateCard(c *gin.Context)
 	UpdateCard(c *gin.Context)
@@ -23,17 +22,6 @@ type handler struct {
 
 func New(cardInteractor card.Interactor) Handler {
 	return &handler{cardInteractor}
-}
-
-func (h *handler) GetCard(c *gin.Context) {
-	id := c.Param("id")
-
-	card, err := h.cardInteractor.GetCard(id)
-	if err != nil {
-		panic(err)
-	}
-
-	c.JSON(http.StatusOK, gin.H{"data": card})
 }
 
 func (h *handler) ListCards(c *gin.Context) {
