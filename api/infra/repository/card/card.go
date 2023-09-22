@@ -31,14 +31,6 @@ func (r *Repository) SelectAll(cards *[]entity.Card, userID string) error {
 	return nil
 }
 
-func (r *Repository) SelectById(card *entity.Card, id string) error {
-	if err := r.db.First(card, "card_id = ?", id).Error; err != nil {
-		return err
-	}
-
-	return nil
-}
-
 func (r *Repository) UpdateById(card *entity.Card, id string) error {
 	result := r.db.Model(card).Where("card_id = ?", id).Updates(card)
 	if result.Error != nil {

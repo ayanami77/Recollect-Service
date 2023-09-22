@@ -10,7 +10,6 @@ import (
 )
 
 type Handler interface {
-	GetCard(c *gin.Context)
 	ListCards(c *gin.Context)
 	CreateCard(c *gin.Context)
 	UpdateCard(c *gin.Context)
@@ -25,27 +24,8 @@ func New(cardInteractor card.Interactor) Handler {
 	return &handler{cardInteractor}
 }
 
-func (h *handler) GetCard(c *gin.Context) {
-	id := c.Param("id")
-
-	card, err := h.cardInteractor.GetCard(id)
-	if err != nil {
-		panic(err)
-	}
-
-	c.JSON(http.StatusOK, gin.H{"data": card})
-}
-
 func (h *handler) ListCards(c *gin.Context) {
-	tokenString, err := c.Cookie("user_token")
-	if err != nil {
-		panic(err)
-	}
-	token, err := utils.ParseToken(tokenString)
-	var userID string
-	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		userID = claims["user_id"].(string)
-	}
+	userID := userIDFromToken(c)
 
 	cards, err := h.cardInteractor.ListCards(userID)
 	if err != nil {
@@ -56,15 +36,7 @@ func (h *handler) ListCards(c *gin.Context) {
 }
 
 func (h *handler) CreateCard(c *gin.Context) {
-	tokenString, err := c.Cookie("user_token")
-	if err != nil {
-		panic(err)
-	}
-	token, err := utils.ParseToken(tokenString)
-	var userID string
-	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		userID = claims["user_id"].(string)
-	}
+	userID := userIDFromToken(c)
 
 	cardReq := entity.Card{}
 	if err := c.BindJSON(&cardReq); err != nil {
@@ -82,15 +54,7 @@ func (h *handler) CreateCard(c *gin.Context) {
 
 func (h *handler) UpdateCard(c *gin.Context) {
 	id := c.Param("id")
-	tokenString, err := c.Cookie("user_token")
-	if err != nil {
-		panic(err)
-	}
-	token, err := utils.ParseToken(tokenString)
-	var userID string
-	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		userID = claims["user_id"].(string)
-	}
+	userID := userIDFromToken(c)
 
 	cardReq := entity.Card{}
 	if err := c.BindJSON(&cardReq); err != nil {
@@ -117,4 +81,17 @@ func (h *handler) DeleteCard(c *gin.Context) {
 	}
 
 	c.Status(http.StatusNoContent)
+}
+
+func userIDFromToken(c *gin.Context) string {
+	tokenString, err := c.Cookie("user_token")
+	if err != nil {
+		panic(err)
+	}
+	token, err := utils.ParseToken(tokenString)
+	var userID string
+	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		userID = claims["user_id"].(string)
+	}
+	return userID
 }

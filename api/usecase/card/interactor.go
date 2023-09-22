@@ -6,7 +6,6 @@ import (
 )
 
 type Interactor interface {
-	GetCard(id string) (entity.Card, error)
 	ListCards(userID string) ([]entity.Card, error)
 	CreateCard(card entity.Card) (entity.Card, error)
 	UpdateCard(card entity.Card, id string) (entity.Card, error)
@@ -19,17 +18,6 @@ type interactor struct {
 
 func New(cardRepository cardRepository.Repository) Interactor {
 	return &interactor{cardRepository}
-}
-
-func (i *interactor) GetCard(id string) (entity.Card, error) {
-	card := entity.Card{}
-
-	err := i.cardRepository.SelectById(&card, id)
-	if err != nil {
-		return entity.Card{}, err
-	}
-
-	return card, nil
 }
 
 func (i *interactor) ListCards(userID string) ([]entity.Card, error) {
