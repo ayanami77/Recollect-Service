@@ -10,12 +10,10 @@ import (
 )
 
 type Interactor interface {
-	GetUser(id string) (entity.User, error)
 	CreateUser(user entity.User) (entity.User, error)
 	UpdateUser(user entity.User, id string) (entity.User, error)
 	DeleteUser(id string) error
 	LoginUser(id string, password string) (string, error)
-	//LogoutUser(id string) (entity.User, error)
 }
 
 type interactor struct {
@@ -24,17 +22,6 @@ type interactor struct {
 
 func New(userRepository userRepository.Repository) Interactor {
 	return &interactor{userRepository}
-}
-
-func (i *interactor) GetUser(id string) (entity.User, error) {
-	user := entity.User{}
-
-	err := i.userRepository.SelectById(&user, id)
-	if err != nil {
-		return entity.User{}, err
-	}
-
-	return user, nil
 }
 
 func (i *interactor) CreateUser(user entity.User) (entity.User, error) {
@@ -87,5 +74,3 @@ func (i *interactor) LoginUser(id string, password string) (string, error) {
 
 	return tokenString, nil
 }
-
-//func (i *interactor) LogoutUser(id string) (entity.User, error) {}

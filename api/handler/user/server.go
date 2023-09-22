@@ -10,7 +10,6 @@ import (
 )
 
 type Handler interface {
-	GetUser(c *gin.Context)
 	CreateUser(c *gin.Context)
 	UpdateUser(c *gin.Context)
 	DeleteUser(c *gin.Context)
@@ -24,17 +23,6 @@ type handler struct {
 
 func New(userInteractor user.Interactor) Handler {
 	return &handler{userInteractor}
-}
-
-func (h *handler) GetUser(c *gin.Context) {
-	id := c.Param("id")
-
-	user, err := h.userInteractor.GetUser(id)
-	if err != nil {
-		panic(err)
-	}
-
-	c.JSON(http.StatusOK, gin.H{"data": user})
 }
 
 func (h *handler) CreateUser(c *gin.Context) {
