@@ -10,22 +10,7 @@ import (
 )
 
 func New(healthHandler health.Handler, userHandler user.Handler, cardHandler card.Handler) *gin.Engine {
-	router := gin.Default()
-	router.Use(cors.New(cors.Config{
-		AllowOrigins: []string{"http://localhost:3000"},
-		AllowMethods: []string{"GET", "POST", "PATCH", "PUT", "DELETE"},
-		AllowHeaders: []string{
-			"Access-Control-Allow-Origin",
-			"Access-Control-Allow-Credentials",
-			"Access-Control-Allow-Headers",
-			"Content-Type",
-			"Content-Length",
-			"Accept-Encoding",
-			"Authorization",
-		},
-		AllowCredentials: true,
-		MaxAge:           24 * time.Hour,
-	}))
+	router := setupRouter()
 
 	userRouter := router.Group("/user")
 	{
@@ -44,6 +29,37 @@ func New(healthHandler health.Handler, userHandler user.Handler, cardHandler car
 		cardRouter.PATCH("/:id", cardHandler.UpdateCard)
 		cardRouter.DELETE("/:id", cardHandler.DeleteCard)
 	}
+
+	return router
+}
+
+func setupRouter() *gin.Engine {
+	//TODO: CORSの設定を適切にする
+	//router := gin.Default()
+	//router.Use(cors.New(cors.Config{
+	//	AllowOrigins: []string{"http://localhost:3000"},
+	//	AllowMethods: []string{"GET", "POST", "PATCH", "DELETE"},
+	//	AllowHeaders: []string{"Origin", "Content-Type"},
+	//	MaxAge: 24 * time.Hour,
+	//}))
+	//return router
+
+	router := gin.Default()
+	router.Use(cors.New(cors.Config{
+		AllowOrigins: []string{"http://localhost:3000"},
+		AllowMethods: []string{"GET", "POST", "PATCH", "PUT", "DELETE"},
+		AllowHeaders: []string{
+			"Access-Control-Allow-Origin",
+			"Access-Control-Allow-Credentials",
+			"Access-Control-Allow-Headers",
+			"Content-Type",
+			"Content-Length",
+			"Accept-Encoding",
+			"Authorization",
+		},
+		AllowCredentials: true,
+		MaxAge:           24 * time.Hour,
+	}))
 
 	return router
 }
