@@ -13,6 +13,7 @@ services:
       - ./:/app
     depends_on:
       - db
+    env_file: .env
     
   db:
     container_name: db

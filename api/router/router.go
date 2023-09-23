@@ -12,6 +12,8 @@ import (
 func New(healthHandler health.Handler, userHandler user.Handler, cardHandler card.Handler) *gin.Engine {
 	router := setupRouter()
 
+	router.GET("/health", healthHandler.HealthCheck)
+
 	userRouter := router.Group("/user")
 	{
 		userRouter.PATCH("/:id", userHandler.UpdateUser)

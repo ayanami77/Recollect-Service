@@ -2,30 +2,20 @@ package db
 
 import (
 	"fmt"
-	"log"
-
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-)
-
-const (
-	host     = "db"
-	port     = 5432
-	user     = "reco_user"
-	password = "#reco#9Pup"
-	dbName   = "reco_db"
+	"log"
+	"os"
 )
 
 func New() *gorm.DB {
-	// TODO: .envをdockerで使えるようにしたい
-	// if os.Getenv("GO_ENV") == "dev" {
-	// 	err := godotenv.Load()
-	// 	if err != nil {
-	// 		log.Fatalln(err)
-	// 	}
-	// }
+	host := os.Getenv("POSTGRES_HOST")
+	port := os.Getenv("POSTGRES_PORT")
+	user := os.Getenv("POSTGRES_USER")
+	password := os.Getenv("POSTGRES_PASSWORD")
+	dbName := os.Getenv("POSTGRES_DB")
 
-	dsn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbName)
+	dsn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbName)
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		panic(err)
