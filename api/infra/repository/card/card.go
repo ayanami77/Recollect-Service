@@ -23,6 +23,13 @@ func (r *Repository) Insert(card *entity.Card) error {
 	return nil
 }
 
+func (r *Repository) BatchInsert(cards *[]entity.Card) error {
+	if err := r.db.Create(cards).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
 func (r *Repository) SelectAll(cards *[]entity.Card, userID string) error {
 	if err := r.db.Where("user_id = ?", userID).Find(cards).Error; err != nil {
 		return err

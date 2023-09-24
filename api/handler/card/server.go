@@ -12,6 +12,7 @@ import (
 type Handler interface {
 	ListCards(c *gin.Context)
 	CreateCard(c *gin.Context)
+	CreateCards(c *gin.Context)
 	UpdateCard(c *gin.Context)
 	DeleteCard(c *gin.Context)
 }
@@ -50,6 +51,31 @@ func (h *handler) CreateCard(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"data": card})
+}
+
+func (h *handler) CreateCards(c *gin.Context) {
+	type BatchReq struct {
+		Cards []entity.Card `json:"cards"`
+	}
+	var batchReq BatchReq
+
+	userID := userIDFromToken(c)
+
+	if err := c.BindJSON(&batchReq); err != nil {
+		panic(err)
+	}
+
+	cardsReq := batchReq.Cards
+	for i := range cardsReq {
+		cardsReq[i].UserID = userID
+	}
+
+	cards, err := h.cardInteractor.CreateCards(cardsReq)
+	if err != nil {
+		panic(err)
+	}
+
+	c.JSON(http.StatusOK, gin.H{"data": cards})
 }
 
 func (h *handler) UpdateCard(c *gin.Context) {
