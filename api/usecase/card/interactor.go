@@ -8,6 +8,7 @@ import (
 type Interactor interface {
 	ListCards(userID string) ([]entity.Card, error)
 	CreateCard(card entity.Card) (entity.Card, error)
+	CreateCards(cards []entity.Card) ([]entity.Card, error)
 	UpdateCard(card entity.Card, id string) (entity.Card, error)
 	DeleteCard(id string) error
 }
@@ -38,6 +39,15 @@ func (i *interactor) CreateCard(card entity.Card) (entity.Card, error) {
 	}
 
 	return card, nil
+}
+
+func (i *interactor) CreateCards(cards []entity.Card) ([]entity.Card, error) {
+	err := i.cardRepository.BatchInsert(&cards)
+	if err != nil {
+		return []entity.Card{}, nil
+	}
+
+	return cards, nil
 }
 
 func (i *interactor) UpdateCard(card entity.Card, id string) (entity.Card, error) {
