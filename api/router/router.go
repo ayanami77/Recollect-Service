@@ -14,7 +14,7 @@ func New(healthHandler health.Handler, userHandler user.Handler, cardHandler car
 
 	router.GET("/health", healthHandler.HealthCheck)
 
-	userRouter := router.Group("/user")
+	userRouter := router.Group("/users")
 	{
 		userRouter.PATCH("/:id", userHandler.UpdateUser)
 		//userRouter.DELETE("/:id", userHandler.DeleteUser)
@@ -23,11 +23,11 @@ func New(healthHandler health.Handler, userHandler user.Handler, cardHandler car
 		userRouter.POST("/logout", userHandler.LogoutUser)
 	}
 
-	cardRouter := router.Group("/card")
+	cardRouter := router.Group("/cards")
 	{
-		cardRouter.GET("/list", cardHandler.ListCards)
-		cardRouter.POST("/new", cardHandler.CreateCard)
-		cardRouter.POST("/new/batch", cardHandler.CreateCards)
+		cardRouter.GET("", cardHandler.ListCards)
+		cardRouter.POST("", cardHandler.CreateCard)
+		cardRouter.POST("/batch", cardHandler.CreateCards)
 		cardRouter.PATCH("/:id", cardHandler.UpdateCard)
 		cardRouter.DELETE("/:id", cardHandler.DeleteCard)
 	}
