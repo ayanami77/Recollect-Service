@@ -6,10 +6,10 @@ import (
 )
 
 type UserResponse struct {
-	UserID    string
-	UserName  string
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	UserID    string    `json:"user_id"`
+	UserName  string    `json:"user_name"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }
 
 func ToUserResponse(user *entity.User) UserResponse {

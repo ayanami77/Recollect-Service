@@ -7,14 +7,14 @@ import (
 )
 
 type CardResponse struct {
-	CardID         string
-	Period         string
-	Title          string
-	Content        string
-	AnalysisResult string
-	Tags           pq.StringArray
-	CreatedAt      time.Time
-	UpdatedAt      time.Time
+	CardID         string         `json:"card_id"`
+	Period         string         `json:"period"`
+	Title          string         `json:"title"`
+	Content        string         `json:"content"`
+	AnalysisResult string         `json:"analysis_result"`
+	Tags           pq.StringArray `json:"tags"`
+	CreatedAt      time.Time      `json:"created_at"`
+	UpdatedAt      time.Time      `json:"updated_at"`
 }
 
 func ToCardResponse(card *entity.Card) CardResponse {
