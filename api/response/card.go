@@ -8,7 +8,6 @@ import (
 
 type CardResponse struct {
 	CardID         string
-	UserID         string
 	Period         string
 	Title          string
 	Content        string
@@ -16,13 +15,11 @@ type CardResponse struct {
 	Tags           pq.StringArray
 	CreatedAt      time.Time
 	UpdatedAt      time.Time
-	DeletedAt      time.Time
 }
 
 func ToCardResponse(card *entity.Card) CardResponse {
 	cardResponse := CardResponse{
 		CardID:         card.CardID,
-		UserID:         card.UserID,
 		Period:         card.Period,
 		Title:          card.Title,
 		Content:        card.Content,
@@ -30,7 +27,15 @@ func ToCardResponse(card *entity.Card) CardResponse {
 		Tags:           card.Tags,
 		CreatedAt:      card.CreatedAt,
 		UpdatedAt:      card.UpdatedAt,
-		DeletedAt:      card.DeletedAt,
 	}
 	return cardResponse
+}
+
+func ToCardsResponse(cards *[]entity.Card) []CardResponse {
+	cardsResponse := []CardResponse{}
+	for _, card := range *cards {
+		cardResponse := ToCardResponse(&card)
+		cardsResponse = append(cardsResponse, cardResponse)
+	}
+	return cardsResponse
 }

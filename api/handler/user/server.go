@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/Seiya-Tagami/Recollect-Service/api/domain/entity"
+	"github.com/Seiya-Tagami/Recollect-Service/api/response"
 	"github.com/Seiya-Tagami/Recollect-Service/api/usecase/user"
 	"github.com/gin-gonic/gin"
 )
@@ -52,7 +53,9 @@ func (h *handler) UpdateUser(c *gin.Context) {
 		panic(err)
 	}
 
-	c.JSON(http.StatusOK, gin.H{"data": user})
+	userResponse := response.ToUserResponse(&user)
+
+	c.JSON(http.StatusOK, gin.H{"data": userResponse})
 }
 
 func (h *handler) DeleteUser(c *gin.Context) {

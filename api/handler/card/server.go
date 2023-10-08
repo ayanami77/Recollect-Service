@@ -2,6 +2,7 @@ package card
 
 import (
 	"github.com/Seiya-Tagami/Recollect-Service/api/domain/entity"
+	"github.com/Seiya-Tagami/Recollect-Service/api/response"
 	"github.com/Seiya-Tagami/Recollect-Service/api/usecase/card"
 	"github.com/Seiya-Tagami/Recollect-Service/api/utils"
 	"github.com/gin-gonic/gin"
@@ -33,7 +34,9 @@ func (h *handler) ListCards(c *gin.Context) {
 		panic(err)
 	}
 
-	c.JSON(http.StatusOK, gin.H{"data": cards})
+	cardsResponse := response.ToCardsResponse(&cards)
+
+	c.JSON(http.StatusOK, gin.H{"data": cardsResponse})
 }
 
 func (h *handler) CreateCard(c *gin.Context) {
@@ -50,7 +53,9 @@ func (h *handler) CreateCard(c *gin.Context) {
 		panic(err)
 	}
 
-	c.JSON(http.StatusOK, gin.H{"data": card})
+	cardResponse := response.ToCardResponse(&card)
+
+	c.JSON(http.StatusOK, gin.H{"data": cardResponse})
 }
 
 func (h *handler) CreateCards(c *gin.Context) {
@@ -75,7 +80,9 @@ func (h *handler) CreateCards(c *gin.Context) {
 		panic(err)
 	}
 
-	c.JSON(http.StatusOK, gin.H{"data": cards})
+	cardsResponse := response.ToCardsResponse(&cards)
+
+	c.JSON(http.StatusOK, gin.H{"data": cardsResponse})
 }
 
 func (h *handler) UpdateCard(c *gin.Context) {
@@ -95,7 +102,9 @@ func (h *handler) UpdateCard(c *gin.Context) {
 		panic(err)
 	}
 
-	c.JSON(http.StatusOK, gin.H{"data": card})
+	cardResponse := response.ToCardResponse(&card)
+
+	c.JSON(http.StatusOK, gin.H{"data": cardResponse})
 }
 
 func (h *handler) DeleteCard(c *gin.Context) {

@@ -10,7 +10,6 @@ type UserResponse struct {
 	UserName  string
 	CreatedAt time.Time
 	UpdatedAt time.Time
-	DeletedAt time.Time
 }
 
 func ToUserResponse(user *entity.User) UserResponse {
@@ -19,7 +18,6 @@ func ToUserResponse(user *entity.User) UserResponse {
 		UserName:  user.UserName,
 		CreatedAt: user.CreatedAt,
 		UpdatedAt: user.UpdatedAt,
-		DeletedAt: user.DeletedAt,
 	}
 	return userResponse
 }
