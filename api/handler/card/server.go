@@ -42,7 +42,7 @@ func (h *handler) ListCards(c *gin.Context) {
 
 	cardsResponse := response.ToCardsResponse(&cards)
 
-	c.JSON(http.StatusOK, gin.H{"data": cardsResponse})
+	c.JSON(http.StatusOK, cardsResponse)
 }
 
 func (h *handler) CreateCard(c *gin.Context) {
@@ -67,7 +67,7 @@ func (h *handler) CreateCard(c *gin.Context) {
 
 	cardResponse := response.ToCardResponse(&card)
 
-	c.JSON(http.StatusOK, gin.H{"data": cardResponse})
+	c.JSON(http.StatusOK, cardResponse)
 }
 
 func (h *handler) CreateCards(c *gin.Context) {
@@ -100,7 +100,7 @@ func (h *handler) CreateCards(c *gin.Context) {
 
 	cardsResponse := response.ToCardsResponse(&cards)
 
-	c.JSON(http.StatusOK, gin.H{"data": cardsResponse})
+	c.JSON(http.StatusOK, cardsResponse)
 }
 
 func (h *handler) UpdateCard(c *gin.Context) {
@@ -128,7 +128,7 @@ func (h *handler) UpdateCard(c *gin.Context) {
 
 	cardResponse := response.ToCardResponse(&card)
 
-	c.JSON(http.StatusOK, gin.H{"data": cardResponse})
+	c.JSON(http.StatusOK, cardResponse)
 }
 
 func (h *handler) DeleteCard(c *gin.Context) {
@@ -145,12 +145,11 @@ func (h *handler) DeleteCard(c *gin.Context) {
 
 func userIDFromToken(c *gin.Context) (string, error) {
 	tokenString, err := c.Cookie("user_token")
-	if err != nil {
-		myerror.HandleError(c, err)
+	if len(tokenString) == 0 || err != nil {
 		return "", myerror.InvalidRequest
 	}
 	token, err := util.ParseToken(tokenString)
-	if token == nil || err != nil {
+	if err != nil {
 		return "", myerror.InvalidRequest
 	}
 
