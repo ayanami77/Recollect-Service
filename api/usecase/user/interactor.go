@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/Seiya-Tagami/Recollect-Service/api/domain/entity"
 	userRepository "github.com/Seiya-Tagami/Recollect-Service/api/domain/repository/user"
+	"github.com/Seiya-Tagami/Recollect-Service/api/handler/util/myerror"
 	"github.com/golang-jwt/jwt/v5"
 	"os"
 	"time"
@@ -27,7 +28,7 @@ func New(userRepository userRepository.Repository) Interactor {
 func (i *interactor) CreateUser(user entity.User) (entity.User, error) {
 	err := i.userRepository.Insert(&user)
 	if err != nil {
-		return entity.User{}, err
+		return entity.User{}, myerror.InternalServerError
 	}
 
 	return user, nil
@@ -35,7 +36,7 @@ func (i *interactor) CreateUser(user entity.User) (entity.User, error) {
 
 func (i *interactor) UpdateUser(user entity.User, id string) (entity.User, error) {
 	if err := i.userRepository.UpdateById(&user, id); err != nil {
-		return entity.User{}, err
+		return entity.User{}, myerror.InternalServerError
 	}
 
 	return user, nil
@@ -43,7 +44,7 @@ func (i *interactor) UpdateUser(user entity.User, id string) (entity.User, error
 
 func (i *interactor) DeleteUser(id string) error {
 	if err := i.userRepository.DeleteById(id); err != nil {
-		return err
+		return myerror.InternalServerError
 	}
 
 	return nil
@@ -54,12 +55,12 @@ func (i *interactor) LoginUser(id string, password string) (string, error) {
 
 	err := i.userRepository.SelectById(&user, id)
 	if err != nil {
-		return "", err
+		return "", myerror.InternalServerError
 	}
 
 	if user.Password != password {
 		err = fmt.Errorf("password is not correct")
-		return "", err
+		return "", myerror.InvalidRequest
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
@@ -69,7 +70,7 @@ func (i *interactor) LoginUser(id string, password string) (string, error) {
 
 	tokenString, err := token.SignedString([]byte(os.Getenv("SECRET")))
 	if err != nil {
-		return "", err
+		return "", myerror.InternalServerError
 	}
 
 	return tokenString, nil

@@ -1,6 +1,7 @@
 package user
 
 import (
+	"github.com/Seiya-Tagami/Recollect-Service/api/handler/util/myerror"
 	"net/http"
 	"os"
 
@@ -34,10 +35,12 @@ func (h *handler) CreateUser(c *gin.Context) {
 
 	user, err := h.userInteractor.CreateUser(userReq)
 	if err != nil {
-		panic(err)
+		myerror.HandleError(c, err)
+		return
 	}
+	userResponse := response.ToUserResponse(&user)
 
-	c.JSON(http.StatusOK, gin.H{"data": user})
+	c.JSON(http.StatusOK, userResponse)
 }
 
 func (h *handler) UpdateUser(c *gin.Context) {
@@ -45,17 +48,19 @@ func (h *handler) UpdateUser(c *gin.Context) {
 
 	userReq := entity.User{}
 	if err := c.BindJSON(&userReq); err != nil {
-		panic(err)
+		myerror.HandleError(c, err)
+		return
 	}
 
 	user, err := h.userInteractor.UpdateUser(userReq, id)
 	if err != nil {
-		panic(err)
+		myerror.HandleError(c, err)
+		return
 	}
 
 	userResponse := response.ToUserResponse(&user)
 
-	c.JSON(http.StatusOK, gin.H{"data": userResponse})
+	c.JSON(http.StatusOK, userResponse)
 }
 
 func (h *handler) DeleteUser(c *gin.Context) {
@@ -63,7 +68,8 @@ func (h *handler) DeleteUser(c *gin.Context) {
 
 	err := h.userInteractor.DeleteUser(id)
 	if err != nil {
-		panic(err)
+		myerror.HandleError(c, err)
+		return
 	}
 
 	c.Status(http.StatusNoContent)
@@ -72,12 +78,14 @@ func (h *handler) DeleteUser(c *gin.Context) {
 func (h *handler) LoginUser(c *gin.Context) {
 	userReq := entity.User{}
 	if err := c.BindJSON(&userReq); err != nil {
-		panic(err)
+		myerror.HandleError(c, err)
+		return
 	}
 
 	tokenString, err := h.userInteractor.LoginUser(userReq.UserID, userReq.Password)
 	if err != nil {
-		panic(err)
+		myerror.HandleError(c, err)
+		return
 	}
 
 	c.SetSameSite(http.SameSiteNoneMode)
