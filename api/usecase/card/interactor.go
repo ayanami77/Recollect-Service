@@ -7,7 +7,7 @@ import (
 )
 
 type Interactor interface {
-	ListCards(userID string) ([]entity.Card, error)
+	ListCards(sub string) ([]entity.Card, error)
 	CreateCard(card entity.Card) (entity.Card, error)
 	CreateCards(cards []entity.Card) ([]entity.Card, error)
 	UpdateCard(card entity.Card, id string) (entity.Card, error)
@@ -22,10 +22,10 @@ func New(cardRepository cardRepository.Repository) Interactor {
 	return &interactor{cardRepository}
 }
 
-func (i *interactor) ListCards(userID string) ([]entity.Card, error) {
+func (i *interactor) ListCards(sub string) ([]entity.Card, error) {
 	cards := []entity.Card{}
 
-	err := i.cardRepository.SelectAll(&cards, userID)
+	err := i.cardRepository.SelectAll(&cards, sub)
 	if err != nil {
 		return []entity.Card{}, myerror.InternalServerError
 	}

@@ -9,6 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 	"net/http"
+	"strings"
 )
 
 type Handler interface {
@@ -28,13 +29,13 @@ func New(cardInteractor card.Interactor) Handler {
 }
 
 func (h *handler) ListCards(c *gin.Context) {
-	userID, err := userIDFromToken(c)
+	sub, err := subFromToken(c)
 	if err != nil {
 		myerror.HandleError(c, err)
 		return
 	}
 
-	cards, err := h.cardInteractor.ListCards(userID)
+	cards, err := h.cardInteractor.ListCards(sub)
 	if err != nil {
 		myerror.HandleError(c, err)
 		return
@@ -46,7 +47,7 @@ func (h *handler) ListCards(c *gin.Context) {
 }
 
 func (h *handler) CreateCard(c *gin.Context) {
-	userID, err := userIDFromToken(c)
+	sub, err := subFromToken(c)
 	if err != nil {
 		myerror.HandleError(c, err)
 		return
@@ -57,7 +58,7 @@ func (h *handler) CreateCard(c *gin.Context) {
 		myerror.HandleError(c, err)
 		return
 	}
-	cardReq.UserID = userID
+	cardReq.Sub = sub
 
 	card, err := h.cardInteractor.CreateCard(cardReq)
 	if err != nil {
@@ -76,7 +77,7 @@ func (h *handler) CreateCards(c *gin.Context) {
 	}
 	var batchReq BatchReq
 
-	userID, err := userIDFromToken(c)
+	sub, err := subFromToken(c)
 	if err != nil {
 		myerror.HandleError(c, err)
 		return
@@ -89,7 +90,7 @@ func (h *handler) CreateCards(c *gin.Context) {
 
 	cardsReq := batchReq.Cards
 	for i := range cardsReq {
-		cardsReq[i].UserID = userID
+		cardsReq[i].Sub = sub
 	}
 
 	cards, err := h.cardInteractor.CreateCards(cardsReq)
@@ -105,7 +106,7 @@ func (h *handler) CreateCards(c *gin.Context) {
 
 func (h *handler) UpdateCard(c *gin.Context) {
 	id := c.Param("id")
-	userID, err := userIDFromToken(c)
+	sub, err := subFromToken(c)
 	if err != nil {
 		myerror.HandleError(c, err)
 		return
@@ -118,7 +119,7 @@ func (h *handler) UpdateCard(c *gin.Context) {
 	}
 
 	cardReq.CardID = id
-	cardReq.UserID = userID
+	cardReq.Sub = sub
 
 	card, err := h.cardInteractor.UpdateCard(cardReq, id)
 	if err != nil {
@@ -143,19 +144,29 @@ func (h *handler) DeleteCard(c *gin.Context) {
 	c.Status(http.StatusNoContent)
 }
 
-func userIDFromToken(c *gin.Context) (string, error) {
-	tokenString, err := c.Cookie("user_token")
-	if len(tokenString) == 0 || err != nil {
+func subFromToken(c *gin.Context) (string, error) {
+	authHeader := c.GetHeader("Authorization")
+	if authHeader == "" {
 		return "", myerror.InvalidRequest
 	}
+
+	tokenString := strings.TrimPrefix(authHeader, "Bearer ")
+	if tokenString == authHeader {
+		return "", myerror.InvalidRequest // Bearerトークンが見つからない場合
+	}
+
 	token, err := util.ParseToken(tokenString)
 	if err != nil {
 		return "", myerror.InvalidRequest
 	}
 
-	var userID string
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		userID = claims["user_id"].(string)
+		sub, ok := claims["sub"].(string)
+		if !ok {
+			return "", myerror.InvalidRequest // subフィールドが存在しない場合
+		}
+		return sub, nil
 	}
-	return userID, nil
+
+	return "", myerror.InvalidRequest // その他のエラー
 }

@@ -1,20 +1,17 @@
 package user
 
 import (
-	"fmt"
 	"github.com/Seiya-Tagami/Recollect-Service/api/domain/entity"
 	userRepository "github.com/Seiya-Tagami/Recollect-Service/api/domain/repository/user"
 	"github.com/Seiya-Tagami/Recollect-Service/api/handler/util/myerror"
-	"github.com/golang-jwt/jwt/v5"
-	"os"
-	"time"
 )
 
 type Interactor interface {
 	CreateUser(user entity.User) (entity.User, error)
 	UpdateUser(user entity.User, id string) (entity.User, error)
 	DeleteUser(id string) error
-	LoginUser(id string, password string) (string, error)
+	CheckEmailDuplication(email string) (bool, error)
+	CheckUserIDDuplication(userID string) (bool, error)
 }
 
 type interactor struct {
@@ -50,28 +47,20 @@ func (i *interactor) DeleteUser(id string) error {
 	return nil
 }
 
-func (i *interactor) LoginUser(id string, password string) (string, error) {
+func (i *interactor) CheckEmailDuplication(email string) (bool, error) {
 	user := entity.User{}
-
-	err := i.userRepository.SelectById(&user, id)
-	if err != nil {
-		return "", myerror.InternalServerError
+	if err := i.userRepository.SelectByEmail(&user, email); err != nil {
+		return false, myerror.InternalServerError
 	}
 
-	if user.Password != password {
-		err = fmt.Errorf("password is not correct")
-		return "", myerror.InvalidRequest
+	return user.Email != email, nil
+}
+
+func (i *interactor) CheckUserIDDuplication(userID string) (bool, error) {
+	user := entity.User{}
+	if err := i.userRepository.SelectByUserID(&user, userID); err != nil {
+		return false, myerror.InternalServerError
 	}
 
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"user_id": id,
-		"exp":     time.Now().Add(time.Hour * 24).Unix(),
-	})
-
-	tokenString, err := token.SignedString([]byte(os.Getenv("SECRET")))
-	if err != nil {
-		return "", myerror.InternalServerError
-	}
-
-	return tokenString, nil
+	return user.UserID != userID, nil
 }

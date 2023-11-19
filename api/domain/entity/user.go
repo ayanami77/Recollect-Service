@@ -7,10 +7,10 @@ import (
 )
 
 type User struct {
-	UserID    string    `json:"user_id" gorm:"primaryKey" validate:"required,min=3,max=20,alphanumunicode"`
+	Sub       string    `json:"sub" gorm:"primaryKey"` //Google OAuthの識別子
+	UserID    string    `json:"user_id" gorm:"unique;not null" validate:"required,min=3,max=20,alphanumunicode"`
 	UserName  string    `json:"user_name" gorm:"not null"`
-	Email     string    `json:"email" gorm:""`
-	Password  string    `json:"password" gorm:"not null" validate:"required,min=6"`
+	Email     string    `json:"email" gorm:"unique;not null" validate:"required,email"`
 	CreatedAt time.Time `json:"created_at" gorm:"not null"`
 	UpdatedAt time.Time `json:"updated_at" gorm:"not null"`
 	DeletedAt time.Time `json:"deleted_at" gorm:""`

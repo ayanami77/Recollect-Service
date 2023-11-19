@@ -72,3 +72,19 @@ func (r *Repository) DeleteById(id string) error {
 	}
 	return nil
 }
+
+func (r *Repository) SelectByEmail(user *entity.User, email string) error {
+	if err := r.db.First(user, "email = ?", email).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *Repository) SelectByUserID(user *entity.User, userID string) error {
+	if err := r.db.First(user, "user_id = ?", userID).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
