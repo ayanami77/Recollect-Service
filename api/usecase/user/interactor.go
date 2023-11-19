@@ -48,19 +48,19 @@ func (i *interactor) DeleteUser(id string) error {
 }
 
 func (i *interactor) CheckEmailDuplication(email string) (bool, error) {
-	user := entity.User{}
-	if err := i.userRepository.SelectByEmail(&user, email); err != nil {
+	isDuplicated, err := i.userRepository.ExistsByEmail(email)
+	if err != nil {
 		return false, myerror.InternalServerError
 	}
 
-	return user.Email != email, nil
+	return isDuplicated, nil
 }
 
 func (i *interactor) CheckUserIDDuplication(userID string) (bool, error) {
-	user := entity.User{}
-	if err := i.userRepository.SelectByUserID(&user, userID); err != nil {
+	isDuplicated, err := i.userRepository.ExistsByUserID(userID)
+	if err != nil {
 		return false, myerror.InternalServerError
 	}
 
-	return user.UserID != userID, nil
+	return isDuplicated, nil
 }
