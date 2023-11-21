@@ -10,6 +10,7 @@ import (
 	"time"
 )
 
+//go:generate go run github.com/golang/mock/mockgen -source=$GOFILE -destination=$GOPATH/Recollect-Service/api/mock/$GOPACKAGE/$GOFILE -package=mock_$GOPACKAGE
 type Interactor interface {
 	CreateUser(user entity.User) (entity.User, error)
 	UpdateUser(user entity.User, id string) (entity.User, error)

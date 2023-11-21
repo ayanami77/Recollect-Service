@@ -6,6 +6,7 @@ import (
 	"github.com/Seiya-Tagami/Recollect-Service/api/handler/util/myerror"
 )
 
+//go:generate go run github.com/golang/mock/mockgen -source=$GOFILE -destination=$GOPATH/Recollect-Service/api/mock/$GOPACKAGE/$GOFILE -package=mock_$GOPACKAGE
 type Interactor interface {
 	ListCards(userID string) ([]entity.Card, error)
 	CreateCard(card entity.Card) (entity.Card, error)
