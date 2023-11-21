@@ -14,6 +14,7 @@ type User struct {
 	CreatedAt time.Time `json:"created_at" gorm:"not null"`
 	UpdatedAt time.Time `json:"updated_at" gorm:"not null"`
 	DeletedAt time.Time `json:"deleted_at" gorm:""`
+	Cards     []Card    `json:"cards" gorm:"foreignKey:Sub;references:Sub"`
 }
 
 // TODO
