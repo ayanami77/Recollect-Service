@@ -1,14 +1,12 @@
 package user
 
 import (
-	"github.com/Seiya-Tagami/Recollect-Service/api/handler/util/myerror"
-	"net/http"
-	"os"
-
 	"github.com/Seiya-Tagami/Recollect-Service/api/domain/entity"
+	"github.com/Seiya-Tagami/Recollect-Service/api/handler/util/myerror"
 	"github.com/Seiya-Tagami/Recollect-Service/api/response"
 	"github.com/Seiya-Tagami/Recollect-Service/api/usecase/user"
 	"github.com/gin-gonic/gin"
+	"net/http"
 )
 
 //go:generate go run github.com/golang/mock/mockgen -source=$GOFILE -destination=$GOPATH/Recollect-Service/api/mock/$GOPACKAGE/$GOFILE -package=mock_$GOPACKAGE
@@ -16,8 +14,8 @@ type Handler interface {
 	CreateUser(c *gin.Context)
 	UpdateUser(c *gin.Context)
 	DeleteUser(c *gin.Context)
-	LoginUser(c *gin.Context)
-	LogoutUser(c *gin.Context)
+	CheckEmailDuplication(c *gin.Context)
+	CheckUserIDDuplication(c *gin.Context)
 }
 
 type handler struct {
@@ -76,31 +74,42 @@ func (h *handler) DeleteUser(c *gin.Context) {
 	c.Status(http.StatusNoContent)
 }
 
-func (h *handler) LoginUser(c *gin.Context) {
-	userReq := entity.User{}
-	if err := c.BindJSON(&userReq); err != nil {
+func (h *handler) CheckEmailDuplication(c *gin.Context) {
+	emailReq := EmailRequest{}
+	if err := c.BindJSON(&emailReq); err != nil {
 		myerror.HandleError(c, err)
 		return
 	}
 
-	tokenString, err := h.userInteractor.LoginUser(userReq.UserID, userReq.Password)
+	isDuplicated, err := h.userInteractor.CheckEmailDuplication(emailReq.Email)
 	if err != nil {
 		myerror.HandleError(c, err)
 		return
 	}
 
-	c.SetSameSite(http.SameSiteNoneMode)
-
-	// sameSite = Noneの時は、secure属性をつけてあげるようにする。
-	c.SetCookie("user_token", tokenString, 3600, "/", os.Getenv("API_DOMAIN"), true, true)
-
-	c.Status(http.StatusNoContent)
+	c.JSON(http.StatusOK, isDuplicated)
 }
 
-func (h *handler) LogoutUser(c *gin.Context) {
-	c.SetSameSite(http.SameSiteNoneMode)
+func (h *handler) CheckUserIDDuplication(c *gin.Context) {
+	userIDReq := UserIDRequest{}
+	if err := c.BindJSON(&userIDReq); err != nil {
+		myerror.HandleError(c, err)
+		return
+	}
 
-	c.SetCookie("user_token", "", 0, "/", os.Getenv("API_DOMAIN"), true, true)
+	isDuplicated, err := h.userInteractor.CheckUserIDDuplication(userIDReq.UserID)
+	if err != nil {
+		myerror.HandleError(c, err)
+		return
+	}
 
-	c.Status(http.StatusNoContent)
+	c.JSON(http.StatusOK, isDuplicated)
+}
+
+type EmailRequest struct {
+	Email string `json:"email"`
+}
+
+type UserIDRequest struct {
+	UserID string `json:"user_id"`
 }

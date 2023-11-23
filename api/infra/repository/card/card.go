@@ -30,8 +30,8 @@ func (r *Repository) BatchInsert(cards *[]entity.Card) error {
 	return nil
 }
 
-func (r *Repository) SelectAll(cards *[]entity.Card, userID string) error {
-	if err := r.db.Where("user_id = ?", userID).Find(cards).Error; err != nil {
+func (r *Repository) SelectAll(cards *[]entity.Card, sub string) error {
+	if err := r.db.Where("sub = ?", sub).Find(cards).Error; err != nil {
 		return err
 	}
 

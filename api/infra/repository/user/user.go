@@ -72,3 +72,21 @@ func (r *Repository) DeleteById(id string) error {
 	}
 	return nil
 }
+
+func (r *Repository) ExistsByEmail(email string) (bool, error) {
+	var count int64
+	if err := r.db.Model(&entity.User{}).Where("email = ?", email).Count(&count).Error; err != nil {
+		return false, err
+	}
+
+	return count > 0, nil
+}
+
+func (r *Repository) ExistsByUserID(userID string) (bool, error) {
+	var count int64
+	if err := r.db.Model(&entity.User{}).Where("user_id = ?", userID).Count(&count).Error; err != nil {
+		return false, err
+	}
+
+	return count > 0, nil
+}

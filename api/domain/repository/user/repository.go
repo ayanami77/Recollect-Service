@@ -8,4 +8,6 @@ type Repository interface {
 	SelectById(user *entity.User, id string) error
 	UpdateById(user *entity.User, id string) error
 	DeleteById(id string) error
+	ExistsByEmail(email string) (bool, error)
+	ExistsByUserID(userID string) (bool, error)
 }
