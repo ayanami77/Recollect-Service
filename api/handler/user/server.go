@@ -9,6 +9,7 @@ import (
 	"net/http"
 )
 
+//go:generate go run github.com/golang/mock/mockgen -source=$GOFILE -destination=$GOPATH/Recollect-Service/api/mock/$GOPACKAGE/$GOFILE -package=mock_$GOPACKAGE
 type Handler interface {
 	CreateUser(c *gin.Context)
 	UpdateUser(c *gin.Context)

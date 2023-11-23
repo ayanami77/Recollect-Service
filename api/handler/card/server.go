@@ -12,6 +12,7 @@ import (
 	"strings"
 )
 
+//go:generate go run github.com/golang/mock/mockgen -source=$GOFILE -destination=$GOPATH/Recollect-Service/api/mock/$GOPACKAGE/$GOFILE -package=mock_$GOPACKAGE
 type Handler interface {
 	ListCards(c *gin.Context)
 	CreateCard(c *gin.Context)
