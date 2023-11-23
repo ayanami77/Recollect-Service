@@ -39,7 +39,7 @@ func (r *Repository) SelectAll(cards *[]entity.Card, sub string) error {
 }
 
 func (r *Repository) UpdateById(card *entity.Card, id string) error {
-	result := r.db.Model(card).Where("sub = ?", id).Updates(card)
+	result := r.db.Model(card).Where("card_id = ?", id).Updates(card)
 	if result.Error != nil {
 		return result.Error
 	}
