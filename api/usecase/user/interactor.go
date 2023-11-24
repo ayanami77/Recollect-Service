@@ -6,7 +6,7 @@ import (
 	"github.com/Seiya-Tagami/Recollect-Service/api/handler/util/myerror"
 )
 
-//go:generate go run github.com/golang/mock/mockgen -source=$GOFILE -destination=$GOPATH/Recollect-Service/api/mock/$GOPACKAGE/$GOFILE -package=mock_$GOPACKAGE
+//go:generate mockgen -source=$GOFILE -destination=$GOPATH/Recollect-Service/api/mock/$GOPACKAGE/$GOFILE -package=mock_$GOPACKAGE
 type Interactor interface {
 	CreateUser(user entity.User) (entity.User, error)
 	UpdateUser(user entity.User, sub string) (entity.User, error)

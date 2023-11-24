@@ -34,18 +34,18 @@ func (m *MockRepository) EXPECT() *MockRepositoryMockRecorder {
 	return m.recorder
 }
 
-// DeleteById mocks base method.
-func (m *MockRepository) DeleteById(id string) error {
+// DeleteBySub mocks base method.
+func (m *MockRepository) DeleteBySub(sub string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DeleteById", id)
+	ret := m.ctrl.Call(m, "DeleteBySub", sub)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-// DeleteById indicates an expected call of DeleteById.
-func (mr *MockRepositoryMockRecorder) DeleteById(id interface{}) *gomock.Call {
+// DeleteBySub indicates an expected call of DeleteBySub.
+func (mr *MockRepositoryMockRecorder) DeleteBySub(sub interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteById", reflect.TypeOf((*MockRepository)(nil).DeleteById), id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteBySub", reflect.TypeOf((*MockRepository)(nil).DeleteBySub), sub)
 }
 
 // ExistsByEmail mocks base method.
@@ -92,30 +92,16 @@ func (mr *MockRepositoryMockRecorder) Insert(user interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Insert", reflect.TypeOf((*MockRepository)(nil).Insert), user)
 }
 
-// SelectById mocks base method.
-func (m *MockRepository) SelectById(user *entity.User, id string) error {
+// UpdateBySub mocks base method.
+func (m *MockRepository) UpdateBySub(user *entity.User, sub string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SelectById", user, id)
+	ret := m.ctrl.Call(m, "UpdateBySub", user, sub)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-// SelectById indicates an expected call of SelectById.
-func (mr *MockRepositoryMockRecorder) SelectById(user, id interface{}) *gomock.Call {
+// UpdateBySub indicates an expected call of UpdateBySub.
+func (mr *MockRepositoryMockRecorder) UpdateBySub(user, sub interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SelectById", reflect.TypeOf((*MockRepository)(nil).SelectById), user, id)
-}
-
-// UpdateById mocks base method.
-func (m *MockRepository) UpdateById(user *entity.User, id string) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UpdateById", user, id)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// UpdateById indicates an expected call of UpdateById.
-func (mr *MockRepositoryMockRecorder) UpdateById(user, id interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateById", reflect.TypeOf((*MockRepository)(nil).UpdateById), user, id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateBySub", reflect.TypeOf((*MockRepository)(nil).UpdateBySub), user, sub)
 }
