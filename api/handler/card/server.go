@@ -122,7 +122,7 @@ func (h *handler) UpdateCard(c *gin.Context) {
 	cardReq.CardID = id
 	cardReq.Sub = sub
 
-	card, err := h.cardInteractor.UpdateCard(cardReq, id)
+	card, err := h.cardInteractor.UpdateCard(cardReq, id, sub)
 	if err != nil {
 		myerror.HandleError(c, err)
 		return
@@ -135,8 +135,13 @@ func (h *handler) UpdateCard(c *gin.Context) {
 
 func (h *handler) DeleteCard(c *gin.Context) {
 	id := c.Param("id")
+	sub, err := subFromToken(c)
+	if err != nil {
+		myerror.HandleError(c, err)
+		return
+	}
 
-	err := h.cardInteractor.DeleteCard(id)
+	err = h.cardInteractor.DeleteCard(id, sub)
 	if err != nil {
 		myerror.HandleError(c, err)
 		return

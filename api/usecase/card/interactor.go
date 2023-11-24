@@ -11,8 +11,8 @@ type Interactor interface {
 	ListCards(sub string) ([]entity.Card, error)
 	CreateCard(card entity.Card) (entity.Card, error)
 	CreateCards(cards []entity.Card) ([]entity.Card, error)
-	UpdateCard(card entity.Card, id string) (entity.Card, error)
-	DeleteCard(id string) error
+	UpdateCard(card entity.Card, id string, sub string) (entity.Card, error)
+	DeleteCard(id string, sub string) error
 }
 
 type interactor struct {
@@ -52,16 +52,16 @@ func (i *interactor) CreateCards(cards []entity.Card) ([]entity.Card, error) {
 	return cards, nil
 }
 
-func (i *interactor) UpdateCard(card entity.Card, id string) (entity.Card, error) {
-	if err := i.cardRepository.UpdateById(&card, id); err != nil {
+func (i *interactor) UpdateCard(card entity.Card, id string, sub string) (entity.Card, error) {
+	if err := i.cardRepository.UpdateById(&card, id, sub); err != nil {
 		return entity.Card{}, myerror.InternalServerError
 	}
 
 	return card, nil
 }
 
-func (i *interactor) DeleteCard(id string) error {
-	if err := i.cardRepository.DeleteById(id); err != nil {
+func (i *interactor) DeleteCard(id string, sub string) error {
+	if err := i.cardRepository.DeleteById(id, sub); err != nil {
 		return myerror.InternalServerError
 	}
 
