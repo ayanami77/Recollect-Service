@@ -36,15 +36,7 @@ func (r *Repository) Insert(user *entity.User) error {
 	return nil
 }
 
-func (r *Repository) SelectById(user *entity.User, id string) error {
-	if err := r.db.First(user, "user_id = ?", id).Error; err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (r *Repository) UpdateById(user *entity.User, id string) error {
+func (r *Repository) UpdateBySub(user *entity.User, sub string) error {
 	validate := validator.New()
 	//validate.RegisterValidation("includeNumeric", entity.IncludeAlphabetic)
 	//validate.RegisterValidation("includeAlphabetic", entity.IncludeNumeric)
@@ -52,7 +44,7 @@ func (r *Repository) UpdateById(user *entity.User, id string) error {
 		return err
 	}
 
-	result := r.db.Model(user).Where("user_id = ?", id).Updates(user)
+	result := r.db.Model(user).Where("sub = ?", sub).Updates(user)
 	if result.Error != nil {
 		return result.Error
 	}
@@ -62,8 +54,8 @@ func (r *Repository) UpdateById(user *entity.User, id string) error {
 	return nil
 }
 
-func (r *Repository) DeleteById(id string) error {
-	result := r.db.Where("user_id = ? ", id).Delete(&entity.User{})
+func (r *Repository) DeleteBySub(sub string) error {
+	result := r.db.Where("sub = ? ", sub).Delete(&entity.User{})
 	if result.Error != nil {
 		return result.Error
 	}

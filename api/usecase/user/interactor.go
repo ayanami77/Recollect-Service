@@ -9,8 +9,8 @@ import (
 //go:generate go run github.com/golang/mock/mockgen -source=$GOFILE -destination=$GOPATH/Recollect-Service/api/mock/$GOPACKAGE/$GOFILE -package=mock_$GOPACKAGE
 type Interactor interface {
 	CreateUser(user entity.User) (entity.User, error)
-	UpdateUser(user entity.User, id string) (entity.User, error)
-	DeleteUser(id string) error
+	UpdateUser(user entity.User, sub string) (entity.User, error)
+	DeleteUser(sub string) error
 	CheckEmailDuplication(email string) (bool, error)
 	CheckUserIDDuplication(userID string) (bool, error)
 }
@@ -32,16 +32,16 @@ func (i *interactor) CreateUser(user entity.User) (entity.User, error) {
 	return user, nil
 }
 
-func (i *interactor) UpdateUser(user entity.User, id string) (entity.User, error) {
-	if err := i.userRepository.UpdateById(&user, id); err != nil {
+func (i *interactor) UpdateUser(user entity.User, sub string) (entity.User, error) {
+	if err := i.userRepository.UpdateBySub(&user, sub); err != nil {
 		return entity.User{}, myerror.InternalServerError
 	}
 
 	return user, nil
 }
 
-func (i *interactor) DeleteUser(id string) error {
-	if err := i.userRepository.DeleteById(id); err != nil {
+func (i *interactor) DeleteUser(sub string) error {
+	if err := i.userRepository.DeleteBySub(sub); err != nil {
 		return myerror.InternalServerError
 	}
 
