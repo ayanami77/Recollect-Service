@@ -49,17 +49,17 @@ func (mr *MockRepositoryMockRecorder) BatchInsert(cards interface{}) *gomock.Cal
 }
 
 // DeleteById mocks base method.
-func (m *MockRepository) DeleteById(id string) error {
+func (m *MockRepository) DeleteById(id, sub string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DeleteById", id)
+	ret := m.ctrl.Call(m, "DeleteById", id, sub)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // DeleteById indicates an expected call of DeleteById.
-func (mr *MockRepositoryMockRecorder) DeleteById(id interface{}) *gomock.Call {
+func (mr *MockRepositoryMockRecorder) DeleteById(id, sub interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteById", reflect.TypeOf((*MockRepository)(nil).DeleteById), id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteById", reflect.TypeOf((*MockRepository)(nil).DeleteById), id, sub)
 }
 
 // Insert mocks base method.
@@ -77,29 +77,29 @@ func (mr *MockRepositoryMockRecorder) Insert(card interface{}) *gomock.Call {
 }
 
 // SelectAll mocks base method.
-func (m *MockRepository) SelectAll(card *[]entity.Card, userID string) error {
+func (m *MockRepository) SelectAll(card *[]entity.Card, sub string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SelectAll", card, userID)
+	ret := m.ctrl.Call(m, "SelectAll", card, sub)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // SelectAll indicates an expected call of SelectAll.
-func (mr *MockRepositoryMockRecorder) SelectAll(card, userID interface{}) *gomock.Call {
+func (mr *MockRepositoryMockRecorder) SelectAll(card, sub interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SelectAll", reflect.TypeOf((*MockRepository)(nil).SelectAll), card, userID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SelectAll", reflect.TypeOf((*MockRepository)(nil).SelectAll), card, sub)
 }
 
 // UpdateById mocks base method.
-func (m *MockRepository) UpdateById(card *entity.Card, id string) error {
+func (m *MockRepository) UpdateById(card *entity.Card, id, sub string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UpdateById", card, id)
+	ret := m.ctrl.Call(m, "UpdateById", card, id, sub)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // UpdateById indicates an expected call of UpdateById.
-func (mr *MockRepositoryMockRecorder) UpdateById(card, id interface{}) *gomock.Call {
+func (mr *MockRepositoryMockRecorder) UpdateById(card, id, sub interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateById", reflect.TypeOf((*MockRepository)(nil).UpdateById), card, id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateById", reflect.TypeOf((*MockRepository)(nil).UpdateById), card, id, sub)
 }

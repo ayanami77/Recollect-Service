@@ -65,17 +65,17 @@ func (mr *MockInteractorMockRecorder) CreateCards(cards interface{}) *gomock.Cal
 }
 
 // DeleteCard mocks base method.
-func (m *MockInteractor) DeleteCard(id string) error {
+func (m *MockInteractor) DeleteCard(id, sub string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DeleteCard", id)
+	ret := m.ctrl.Call(m, "DeleteCard", id, sub)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // DeleteCard indicates an expected call of DeleteCard.
-func (mr *MockInteractorMockRecorder) DeleteCard(id interface{}) *gomock.Call {
+func (mr *MockInteractorMockRecorder) DeleteCard(id, sub interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteCard", reflect.TypeOf((*MockInteractor)(nil).DeleteCard), id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteCard", reflect.TypeOf((*MockInteractor)(nil).DeleteCard), id, sub)
 }
 
 // ListCards mocks base method.
@@ -94,16 +94,16 @@ func (mr *MockInteractorMockRecorder) ListCards(sub interface{}) *gomock.Call {
 }
 
 // UpdateCard mocks base method.
-func (m *MockInteractor) UpdateCard(card entity.Card, id string) (entity.Card, error) {
+func (m *MockInteractor) UpdateCard(card entity.Card, id, sub string) (entity.Card, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UpdateCard", card, id)
+	ret := m.ctrl.Call(m, "UpdateCard", card, id, sub)
 	ret0, _ := ret[0].(entity.Card)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // UpdateCard indicates an expected call of UpdateCard.
-func (mr *MockInteractorMockRecorder) UpdateCard(card, id interface{}) *gomock.Call {
+func (mr *MockInteractorMockRecorder) UpdateCard(card, id, sub interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateCard", reflect.TypeOf((*MockInteractor)(nil).UpdateCard), card, id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateCard", reflect.TypeOf((*MockInteractor)(nil).UpdateCard), card, id, sub)
 }
