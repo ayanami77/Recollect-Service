@@ -38,8 +38,8 @@ func (r *Repository) SelectAll(cards *[]entity.Card, sub string) error {
 	return nil
 }
 
-func (r *Repository) UpdateById(card *entity.Card, id string) error {
-	result := r.db.Model(card).Where("card_id = ?", id).Updates(card)
+func (r *Repository) UpdateById(card *entity.Card, id string, sub string) error {
+	result := r.db.Model(card).Where("sub = ?", sub).Where("card_id = ?", id).Updates(card)
 	if result.Error != nil {
 		return result.Error
 	}
@@ -49,8 +49,8 @@ func (r *Repository) UpdateById(card *entity.Card, id string) error {
 	return nil
 }
 
-func (r *Repository) DeleteById(id string) error {
-	result := r.db.Where("card_id = ?", id).Delete(&entity.Card{})
+func (r *Repository) DeleteById(id string, sub string) error {
+	result := r.db.Where("sub = ?", sub).Where("card_id = ?", id).Delete(&entity.Card{})
 	if result.Error != nil {
 		return result.Error
 	}
