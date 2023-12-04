@@ -31,6 +31,7 @@ func New(healthHandler health.Handler, userHandler user.Handler, cardHandler car
 		cardRouter.POST("/batch", cardHandler.CreateCards)
 		cardRouter.PATCH("/:id", cardHandler.UpdateCard)
 		cardRouter.DELETE("/:id", cardHandler.DeleteCard)
+		cardRouter.PATCH("/analysis/:id", cardHandler.UpdateAnalysisResult)
 	}
 
 	return router
