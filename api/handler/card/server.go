@@ -30,7 +30,7 @@ func New(cardInteractor card.Interactor) Handler {
 }
 
 func (h *handler) ListCards(c *gin.Context) {
-	sub, err := subFromToken(c)
+	sub, err := subFromBearerToken(c)
 	if err != nil {
 		myerror.HandleError(c, err)
 		return
@@ -48,7 +48,7 @@ func (h *handler) ListCards(c *gin.Context) {
 }
 
 func (h *handler) CreateCard(c *gin.Context) {
-	sub, err := subFromToken(c)
+	sub, err := subFromBearerToken(c)
 	if err != nil {
 		myerror.HandleError(c, err)
 		return
@@ -78,7 +78,7 @@ func (h *handler) CreateCards(c *gin.Context) {
 	}
 	var batchReq BatchReq
 
-	sub, err := subFromToken(c)
+	sub, err := subFromBearerToken(c)
 	if err != nil {
 		myerror.HandleError(c, err)
 		return
@@ -107,7 +107,7 @@ func (h *handler) CreateCards(c *gin.Context) {
 
 func (h *handler) UpdateCard(c *gin.Context) {
 	id := c.Param("id")
-	sub, err := subFromToken(c)
+	sub, err := subFromBearerToken(c)
 	if err != nil {
 		myerror.HandleError(c, err)
 		return
@@ -135,7 +135,7 @@ func (h *handler) UpdateCard(c *gin.Context) {
 
 func (h *handler) DeleteCard(c *gin.Context) {
 	id := c.Param("id")
-	sub, err := subFromToken(c)
+	sub, err := subFromBearerToken(c)
 	if err != nil {
 		myerror.HandleError(c, err)
 		return
@@ -150,7 +150,7 @@ func (h *handler) DeleteCard(c *gin.Context) {
 	c.Status(http.StatusNoContent)
 }
 
-func subFromToken(c *gin.Context) (string, error) {
+func subFromBearerToken(c *gin.Context) (string, error) {
 	authHeader := c.GetHeader("Authorization")
 	if authHeader == "" {
 		return "", myerror.InvalidRequest
