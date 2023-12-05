@@ -19,6 +19,7 @@ type Handler interface {
 	CreateCards(c *gin.Context)
 	UpdateCard(c *gin.Context)
 	DeleteCard(c *gin.Context)
+	UpdateAnalysisResult(c *gin.Context)
 }
 
 type handler struct {
@@ -148,6 +149,34 @@ func (h *handler) DeleteCard(c *gin.Context) {
 	}
 
 	c.Status(http.StatusNoContent)
+}
+
+func (h *handler) UpdateAnalysisResult(c *gin.Context) {
+	id := c.Param("id")
+	sub, err := subFromBearerToken(c)
+	if err != nil {
+		myerror.HandleError(c, err)
+		return
+	}
+
+	cardReq := entity.Card{}
+	if err := c.BindJSON(&cardReq); err != nil {
+		myerror.HandleError(c, err)
+		return
+	}
+
+	cardReq.CardID = id
+	cardReq.Sub = sub
+
+	card, err := h.cardInteractor.UpdateAnalysisResult(cardReq, id, sub)
+	if err != nil {
+		myerror.HandleError(c, err)
+		return
+	}
+
+	cardResponse := response.ToCardResponse(&card)
+
+	c.JSON(http.StatusOK, cardResponse)
 }
 
 func subFromBearerToken(c *gin.Context) (string, error) {

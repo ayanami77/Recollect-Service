@@ -23,9 +23,9 @@ services:
     ports:
       - 5432:5432
     environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: reco_user
+      POSTGRES_PASSWORD: reco_password
+      POSTGRES_DB: reco_db
     volumes:
       - db-store:/var/lib/postgresql/data
     restart: always
