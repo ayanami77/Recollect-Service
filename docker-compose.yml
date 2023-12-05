@@ -1,0 +1,34 @@
+version: '3'
+
+services:
+  api:
+    container_name: api
+    tty: true
+    build:
+      context: .
+      dockerfile: docker/api/Dockerfile
+    ports:
+      - 8080:8080
+    volumes:
+      - ./:/app
+    depends_on:
+      - db
+    env_file: .env
+    
+  db:
+    container_name: db
+    build: 
+      context: .
+      dockerfile: docker/db/Dockerfile
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: reco_user
+      POSTGRES_PASSWORD: reco_password
+      POSTGRES_DB: reco_db
+    volumes:
+      - db-store:/var/lib/postgresql/data
+    restart: always
+
+volumes:
+  db-store:
