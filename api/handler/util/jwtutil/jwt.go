@@ -22,7 +22,7 @@ func ParseToken(tokenString string) (*jwt.Token, error) {
 	return token, nil
 }
 
-func SubFromToken(c *gin.Context) (string, error) {
+func SubFromBearerToken(c *gin.Context) (string, error) {
 	authHeader := c.GetHeader("Authorization")
 	if authHeader == "" {
 		return "", myerror.InvalidRequest

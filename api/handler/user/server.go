@@ -28,7 +28,7 @@ func New(userInteractor user.Interactor) Handler {
 }
 
 func (h *handler) CreateUser(c *gin.Context) {
-	sub, err := jwtutil.SubFromToken(c)
+	sub, err := jwtutil.SubFromBearerToken(c)
 	if err != nil {
 		myerror.HandleError(c, err)
 		return
@@ -52,7 +52,7 @@ func (h *handler) CreateUser(c *gin.Context) {
 }
 
 func (h *handler) UpdateUser(c *gin.Context) {
-	sub, err := jwtutil.SubFromToken(c)
+	sub, err := jwtutil.SubFromBearerToken(c)
 	if err != nil {
 		myerror.HandleError(c, err)
 		return
@@ -78,7 +78,7 @@ func (h *handler) UpdateUser(c *gin.Context) {
 }
 
 func (h *handler) DeleteUser(c *gin.Context) {
-	sub, err := jwtutil.SubFromToken(c)
+	sub, err := jwtutil.SubFromBearerToken(c)
 	if err != nil {
 		myerror.HandleError(c, err)
 		return
