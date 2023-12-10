@@ -6,8 +6,11 @@ import (
 	"github.com/Seiya-Tagami/Recollect-Service/api/handler/util/myerror"
 	"github.com/Seiya-Tagami/Recollect-Service/api/response"
 	"github.com/Seiya-Tagami/Recollect-Service/api/usecase/card"
+	"github.com/Seiya-Tagami/Recollect-Service/api/util"
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v5"
 	"net/http"
+	"strings"
 )
 
 //go:generate mockgen -source=$GOFILE -destination=$GOPATH/Recollect-Service/api/mock/$GOPACKAGE/$GOFILE -package=mock_$GOPACKAGE
@@ -17,6 +20,7 @@ type Handler interface {
 	CreateCards(c *gin.Context)
 	UpdateCard(c *gin.Context)
 	DeleteCard(c *gin.Context)
+	UpdateAnalysisResult(c *gin.Context)
 }
 
 type handler struct {
@@ -146,4 +150,59 @@ func (h *handler) DeleteCard(c *gin.Context) {
 	}
 
 	c.Status(http.StatusNoContent)
+}
+
+func (h *handler) UpdateAnalysisResult(c *gin.Context) {
+	id := c.Param("id")
+	sub, err := subFromBearerToken(c)
+	if err != nil {
+		myerror.HandleError(c, err)
+		return
+	}
+
+	cardReq := entity.Card{}
+	if err := c.BindJSON(&cardReq); err != nil {
+		myerror.HandleError(c, err)
+		return
+	}
+
+	cardReq.CardID = id
+	cardReq.Sub = sub
+
+	card, err := h.cardInteractor.UpdateAnalysisResult(cardReq, id, sub)
+	if err != nil {
+		myerror.HandleError(c, err)
+		return
+	}
+
+	cardResponse := response.ToCardResponse(&card)
+
+	c.JSON(http.StatusOK, cardResponse)
+}
+
+func subFromBearerToken(c *gin.Context) (string, error) {
+	authHeader := c.GetHeader("Authorization")
+	if authHeader == "" {
+		return "", myerror.InvalidRequest
+	}
+
+	tokenString := strings.TrimPrefix(authHeader, "Bearer ")
+	if tokenString == authHeader {
+		return "", myerror.InvalidRequest // Bearerトークンが見つからない場合
+	}
+
+	token, err := util.ParseToken(tokenString)
+	if err != nil {
+		return "", myerror.InvalidRequest
+	}
+
+	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		sub, ok := claims["sub"].(string)
+		if !ok {
+			return "", myerror.InvalidRequest // subフィールドが存在しない場合
+		}
+		return sub, nil
+	}
+
+	return "", myerror.InvalidRequest // その他のエラー
 }

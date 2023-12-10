@@ -9,6 +9,7 @@ require (
 	github.com/golang-jwt/jwt/v5 v5.0.0
 	github.com/golang/mock v1.6.0
 	github.com/lib/pq v1.10.9
+	github.com/sashabaranov/go-openai v1.17.9
 	gorm.io/driver/postgres v1.5.2
 	gorm.io/gorm v1.25.4
 )
