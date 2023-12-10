@@ -12,6 +12,7 @@ import (
 
 //go:generate mockgen -source=$GOFILE -destination=$GOPATH/Recollect-Service/api/mock/$GOPACKAGE/$GOFILE -package=mock_$GOPACKAGE
 type Handler interface {
+	GetUser(c *gin.Context)
 	CreateUser(c *gin.Context)
 	UpdateUser(c *gin.Context)
 	DeleteUser(c *gin.Context)
@@ -25,6 +26,24 @@ type handler struct {
 
 func New(userInteractor user.Interactor) Handler {
 	return &handler{userInteractor}
+}
+
+func (h *handler) GetUser(c *gin.Context) {
+	sub, err := jwtutil.SubFromBearerToken(c)
+	if err != nil {
+		myerror.HandleError(c, err)
+		return
+	}
+
+	user, err := h.userInteractor.GetUser(sub)
+	if err != nil {
+		myerror.HandleError(c, err)
+		return
+	}
+
+	userResponse := response.ToUserResponse(&user)
+
+	c.JSON(http.StatusOK, userResponse)
 }
 
 func (h *handler) CreateUser(c *gin.Context) {

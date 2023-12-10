@@ -36,6 +36,15 @@ func (r *Repository) Insert(user *entity.User) error {
 	return nil
 }
 
+func (r *Repository) SelectBySub(user *entity.User, sub string) error {
+	result := r.db.Where("sub = ?", sub).First(&user)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
+}
+
 func (r *Repository) UpdateBySub(user *entity.User, sub string) error {
 	validate := validator.New()
 	//validate.RegisterValidation("includeNumeric", entity.IncludeAlphabetic)

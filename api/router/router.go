@@ -17,7 +17,8 @@ func New(healthHandler health.Handler, userHandler user.Handler, cardHandler car
 
 	userRouter := router.Group("/users")
 	{
-		userRouter.PATCH("", userHandler.UpdateUser)
+		userRouter.GET("", userHandler.GetUser)
+		//userRouter.PATCH("", userHandler.UpdateUser)
 		//userRouter.DELETE("", userHandler.DeleteUser)
 		userRouter.POST("/signup", userHandler.CreateUser)
 		userRouter.POST("/email-duplicate-check", userHandler.CheckEmailDuplication)
