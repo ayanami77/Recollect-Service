@@ -8,6 +8,7 @@ import (
 
 //go:generate mockgen -source=$GOFILE -destination=$GOPATH/Recollect-Service/api/mock/$GOPACKAGE/$GOFILE -package=mock_$GOPACKAGE
 type Interactor interface {
+	GetUser(sub string) (entity.User, error)
 	CreateUser(user entity.User) (entity.User, error)
 	UpdateUser(user entity.User, sub string) (entity.User, error)
 	DeleteUser(sub string) error
@@ -21,6 +22,17 @@ type interactor struct {
 
 func New(userRepository userRepository.Repository) Interactor {
 	return &interactor{userRepository}
+}
+
+func (i *interactor) GetUser(sub string) (entity.User, error) {
+	user := entity.User{}
+
+	err := i.userRepository.SelectBySub(&user, sub)
+	if err != nil {
+		return entity.User{}, myerror.InternalServerError
+	}
+
+	return user, nil
 }
 
 func (i *interactor) CreateUser(user entity.User) (entity.User, error) {
