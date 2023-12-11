@@ -2,6 +2,7 @@ package user
 
 import (
 	"github.com/Seiya-Tagami/Recollect-Service/api/domain/entity"
+	"github.com/Seiya-Tagami/Recollect-Service/api/handler/util/jwtutil"
 	"github.com/Seiya-Tagami/Recollect-Service/api/handler/util/myerror"
 	"github.com/Seiya-Tagami/Recollect-Service/api/response"
 	"github.com/Seiya-Tagami/Recollect-Service/api/usecase/user"
@@ -9,7 +10,7 @@ import (
 	"net/http"
 )
 
-//go:generate go run github.com/golang/mock/mockgen -source=$GOFILE -destination=$GOPATH/Recollect-Service/api/mock/$GOPACKAGE/$GOFILE -package=mock_$GOPACKAGE
+//go:generate mockgen -source=$GOFILE -destination=$GOPATH/Recollect-Service/api/mock/$GOPACKAGE/$GOFILE -package=mock_$GOPACKAGE
 type Handler interface {
 	CreateUser(c *gin.Context)
 	UpdateUser(c *gin.Context)
@@ -27,10 +28,18 @@ func New(userInteractor user.Interactor) Handler {
 }
 
 func (h *handler) CreateUser(c *gin.Context) {
+	sub, err := jwtutil.SubFromBearerToken(c)
+	if err != nil {
+		myerror.HandleError(c, err)
+		return
+	}
+
 	userReq := entity.User{}
 	if err := c.BindJSON(&userReq); err != nil {
 		panic(err)
 	}
+
+	userReq.Sub = sub
 
 	user, err := h.userInteractor.CreateUser(userReq)
 	if err != nil {
@@ -43,7 +52,11 @@ func (h *handler) CreateUser(c *gin.Context) {
 }
 
 func (h *handler) UpdateUser(c *gin.Context) {
-	id := c.Param("id")
+	sub, err := jwtutil.SubFromBearerToken(c)
+	if err != nil {
+		myerror.HandleError(c, err)
+		return
+	}
 
 	userReq := entity.User{}
 	if err := c.BindJSON(&userReq); err != nil {
@@ -51,7 +64,9 @@ func (h *handler) UpdateUser(c *gin.Context) {
 		return
 	}
 
-	user, err := h.userInteractor.UpdateUser(userReq, id)
+	userReq.Sub = sub
+
+	user, err := h.userInteractor.UpdateUser(userReq, sub)
 	if err != nil {
 		myerror.HandleError(c, err)
 		return
@@ -63,9 +78,13 @@ func (h *handler) UpdateUser(c *gin.Context) {
 }
 
 func (h *handler) DeleteUser(c *gin.Context) {
-	id := c.Param("id")
+	sub, err := jwtutil.SubFromBearerToken(c)
+	if err != nil {
+		myerror.HandleError(c, err)
+		return
+	}
 
-	err := h.userInteractor.DeleteUser(id)
+	err = h.userInteractor.DeleteUser(sub)
 	if err != nil {
 		myerror.HandleError(c, err)
 		return

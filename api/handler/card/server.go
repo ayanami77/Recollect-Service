@@ -2,14 +2,12 @@ package card
 
 import (
 	"github.com/Seiya-Tagami/Recollect-Service/api/domain/entity"
+	"github.com/Seiya-Tagami/Recollect-Service/api/handler/util/jwtutil"
 	"github.com/Seiya-Tagami/Recollect-Service/api/handler/util/myerror"
 	"github.com/Seiya-Tagami/Recollect-Service/api/response"
 	"github.com/Seiya-Tagami/Recollect-Service/api/usecase/card"
-	"github.com/Seiya-Tagami/Recollect-Service/api/util"
 	"github.com/gin-gonic/gin"
-	"github.com/golang-jwt/jwt/v5"
 	"net/http"
-	"strings"
 )
 
 //go:generate mockgen -source=$GOFILE -destination=$GOPATH/Recollect-Service/api/mock/$GOPACKAGE/$GOFILE -package=mock_$GOPACKAGE
@@ -31,7 +29,7 @@ func New(cardInteractor card.Interactor) Handler {
 }
 
 func (h *handler) ListCards(c *gin.Context) {
-	sub, err := subFromBearerToken(c)
+	sub, err := jwtutil.SubFromBearerToken(c)
 	if err != nil {
 		myerror.HandleError(c, err)
 		return
@@ -49,7 +47,7 @@ func (h *handler) ListCards(c *gin.Context) {
 }
 
 func (h *handler) CreateCard(c *gin.Context) {
-	sub, err := subFromBearerToken(c)
+	sub, err := jwtutil.SubFromBearerToken(c)
 	if err != nil {
 		myerror.HandleError(c, err)
 		return
@@ -79,7 +77,7 @@ func (h *handler) CreateCards(c *gin.Context) {
 	}
 	var batchReq BatchReq
 
-	sub, err := subFromBearerToken(c)
+	sub, err := jwtutil.SubFromBearerToken(c)
 	if err != nil {
 		myerror.HandleError(c, err)
 		return
@@ -108,7 +106,7 @@ func (h *handler) CreateCards(c *gin.Context) {
 
 func (h *handler) UpdateCard(c *gin.Context) {
 	id := c.Param("id")
-	sub, err := subFromBearerToken(c)
+	sub, err := jwtutil.SubFromBearerToken(c)
 	if err != nil {
 		myerror.HandleError(c, err)
 		return
@@ -136,7 +134,7 @@ func (h *handler) UpdateCard(c *gin.Context) {
 
 func (h *handler) DeleteCard(c *gin.Context) {
 	id := c.Param("id")
-	sub, err := subFromBearerToken(c)
+	sub, err := jwtutil.SubFromBearerToken(c)
 	if err != nil {
 		myerror.HandleError(c, err)
 		return
@@ -153,7 +151,7 @@ func (h *handler) DeleteCard(c *gin.Context) {
 
 func (h *handler) UpdateAnalysisResult(c *gin.Context) {
 	id := c.Param("id")
-	sub, err := subFromBearerToken(c)
+	sub, err := jwtutil.SubFromBearerToken(c)
 	if err != nil {
 		myerror.HandleError(c, err)
 		return
@@ -177,31 +175,4 @@ func (h *handler) UpdateAnalysisResult(c *gin.Context) {
 	cardResponse := response.ToCardResponse(&card)
 
 	c.JSON(http.StatusOK, cardResponse)
-}
-
-func subFromBearerToken(c *gin.Context) (string, error) {
-	authHeader := c.GetHeader("Authorization")
-	if authHeader == "" {
-		return "", myerror.InvalidRequest
-	}
-
-	tokenString := strings.TrimPrefix(authHeader, "Bearer ")
-	if tokenString == authHeader {
-		return "", myerror.InvalidRequest // Bearerトークンが見つからない場合
-	}
-
-	token, err := util.ParseToken(tokenString)
-	if err != nil {
-		return "", myerror.InvalidRequest
-	}
-
-	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		sub, ok := claims["sub"].(string)
-		if !ok {
-			return "", myerror.InvalidRequest // subフィールドが存在しない場合
-		}
-		return sub, nil
-	}
-
-	return "", myerror.InvalidRequest // その他のエラー
 }
