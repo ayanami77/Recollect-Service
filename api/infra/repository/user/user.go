@@ -93,15 +93,23 @@ func (r *Repository) ExistsByUserID(userID string) (bool, error) {
 	return count > 0, nil
 }
 
-func (r *Repository) GetAnalysisResultStringBySub(sub string) (string, error) {
+func (r *Repository) GetAnalysisResultStringBySub(sub string) (user.AnalysisData, error) {
 	cards := []entity.Card{}
 	if err := r.db.Select("AnalysisResult").Find(&cards).Where("sub = ?", sub).Error; err != nil {
-		return "", err
+		return user.AnalysisData{}, err
 	}
+
+	userHistoryString := ""
 	analysisResultString := ""
 	for _, card := range cards {
 		analysisResultString += card.AnalysisResult + "\n"
+		userHistoryString += card.Title + "\n" + card.Content + "\n"
 	}
 
-	return analysisResultString, nil
+	analysisString := user.AnalysisData{
+		UserHistoryString:    userHistoryString,
+		AnalysisResultString: analysisResultString,
+	}
+
+	return analysisString, nil
 }

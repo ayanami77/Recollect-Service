@@ -81,12 +81,12 @@ func (i *interactor) CheckUserIDDuplication(userID string) (bool, error) {
 }
 
 func (i *interactor) AnalyzeUserHistory(sub string) (entity.User, error) {
-	analysisResultString, err := i.userRepository.GetAnalysisResultStringBySub(sub)
+	analysisResult, err := i.userRepository.GetAnalysisResultStringBySub(sub)
 	if err != nil {
 		return entity.User{}, myerror.InternalServerError
 	}
 
-	comprehensiveAnalysisResult, err := getComprehensiveAnalysisResult(analysisResultString)
+	comprehensiveAnalysisResult, err := getComprehensiveAnalysisResult(analysisResult.AnalysisResultString, analysisResult.UserHistoryString)
 	if err != nil {
 		return entity.User{}, myerror.InternalServerError
 	}
@@ -104,9 +104,9 @@ func (i *interactor) AnalyzeUserHistory(sub string) (entity.User, error) {
 	return i.UpdateUser(user, sub)
 }
 
-func getComprehensiveAnalysisResult(analysisResultString string) (string, error) {
+func getComprehensiveAnalysisResult(analysisResultString string, userHistoryString string) (string, error) {
 	prompt := `
-    下記の特性から、その人を分析しフォーマット例のように一言にまとめ、マークダウンで出力してください。
+    下記の特性と自分史から、その人を分析しフォーマット例のように一言にまとめ、マークダウンで出力してください。
     
     フォーマット例:「
         **実験とリーダーシップの熱心な探求者**\n実験好きの特性は、新しいことへの挑戦と知識の追求を示しており、リーダーシップの特性は、チームを導き、目標達成に向けて取り組む力を表しています。また、計画性、積極性、コミュニケーション能力もこのフレーズに含まれており、あなたの多面的な資質を総合的に表現しています。
@@ -115,7 +115,11 @@ func getComprehensiveAnalysisResult(analysisResultString string) (string, error)
     特性:「
 	` + analysisResultString + `
     」
-  	`
+
+	自分史: 「
+    ` + userHistoryString + `
+    」
+	`
 	return openaiutil.FetchOpenAIResponse(prompt)
 }
 
