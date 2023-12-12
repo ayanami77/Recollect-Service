@@ -18,6 +18,7 @@ type Handler interface {
 	DeleteUser(c *gin.Context)
 	CheckEmailDuplication(c *gin.Context)
 	CheckUserIDDuplication(c *gin.Context)
+	AnalyzeUserHistory(c *gin.Context)
 }
 
 type handler struct {
@@ -142,6 +143,24 @@ func (h *handler) CheckUserIDDuplication(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, isDuplicated)
+}
+
+func (h *handler) AnalyzeUserHistory(c *gin.Context) {
+	sub, err := jwtutil.SubFromBearerToken(c)
+	if err != nil {
+		myerror.HandleError(c, err)
+		return
+	}
+
+	user, err := h.userInteractor.AnalyzeUserHistory(sub)
+	if err != nil {
+		myerror.HandleError(c, err)
+		return
+	}
+
+	userResponse := response.ToUserResponse(&user)
+
+	c.JSON(http.StatusOK, userResponse)
 }
 
 type EmailRequest struct {

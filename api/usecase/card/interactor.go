@@ -1,12 +1,10 @@
 package card
 
 import (
-	"context"
 	"github.com/Seiya-Tagami/Recollect-Service/api/domain/entity"
 	cardRepository "github.com/Seiya-Tagami/Recollect-Service/api/domain/repository/card"
 	"github.com/Seiya-Tagami/Recollect-Service/api/handler/util/myerror"
-	"github.com/sashabaranov/go-openai"
-	"os"
+	"github.com/Seiya-Tagami/Recollect-Service/api/usecase/util/openaiutil"
 	"regexp"
 )
 
@@ -104,25 +102,7 @@ func getAnalysisResult(title string, content string) (string, error) {
       ` + content + `
     」
   	`
-
-	client := openai.NewClient(os.Getenv("OPENAI_API_KEY"))
-	resp, err := client.CreateChatCompletion(
-		context.Background(),
-		openai.ChatCompletionRequest{
-			Model: openai.GPT3Dot5Turbo,
-			Messages: []openai.ChatCompletionMessage{
-				{
-					Role:    openai.ChatMessageRoleUser,
-					Content: prompt,
-				},
-			},
-		},
-	)
-	if err != nil {
-		return "", err
-	}
-
-	return resp.Choices[0].Message.Content, nil
+	return openaiutil.FetchOpenAIResponse(prompt)
 }
 
 func generateTagsFromAnalysisResult(analysisResult string) []string {
