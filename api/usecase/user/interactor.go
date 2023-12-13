@@ -81,7 +81,7 @@ func (i *interactor) CheckUserIDDuplication(userID string) (bool, error) {
 }
 
 func (i *interactor) AnalyzeUserHistory(sub string) (entity.User, error) {
-	analysisData, err := i.userRepository.GetAnalysisResultStringBySub(sub)
+	analysisData, err := i.userRepository.GetAnalysisDataBySub(sub)
 	if err != nil {
 		return entity.User{}, myerror.InternalServerError
 	}
@@ -104,7 +104,12 @@ func (i *interactor) AnalyzeUserHistory(sub string) (entity.User, error) {
 	return i.UpdateUser(user, sub)
 }
 
-func getComprehensiveAnalysisResult(analysisData userRepository.AnalysisData) (string, error) {
+type AnalysisData struct {
+	UserHistoryString    string
+	AnalysisResultString string
+}
+
+func getComprehensiveAnalysisResult(analysisData AnalysisData) (string, error) {
 	prompt := `
     下記の特性と自分史から分析し、マークダウンで出力します。
 
@@ -125,7 +130,7 @@ func getComprehensiveAnalysisResult(analysisData userRepository.AnalysisData) (s
 	return openaiutil.FetchOpenAIResponse(prompt)
 }
 
-func getComprehensiveAnalysisScore(comprehensiveAnalysisResult string, analysisData userRepository.AnalysisData) (string, error) {
+func getComprehensiveAnalysisScore(comprehensiveAnalysisResult string, analysisData AnalysisData) (string, error) {
 	prompt := `
      下記の分析結果は、その人を総合分析したものです。重要なので忘れないでください。
     分析結果:「
