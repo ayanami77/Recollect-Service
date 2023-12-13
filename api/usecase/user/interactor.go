@@ -106,11 +106,7 @@ func (i *interactor) AnalyzeUserHistory(sub string) (entity.User, error) {
 
 func getComprehensiveAnalysisResult(analysisData userRepository.AnalysisData) (string, error) {
 	prompt := `
-    下記の特性と自分史から、その人を分析しフォーマット例のように一言にまとめ、マークダウンで出力してください。
-    
-    フォーマット例:「
-        **実験とリーダーシップの熱心な探求者**\n実験好きの特性は、新しいことへの挑戦と知識の追求を示しており、リーダーシップの特性は、チームを導き、目標達成に向けて取り組む力を表しています。また、計画性、積極性、コミュニケーション能力もこのフレーズに含まれており、あなたの多面的な資質を総合的に表現しています。
-    」
+    下記の特性と自分史から分析し、マークダウンで出力します。
 
     特性:「
 	` + analysisData.AnalysisResultString + `
@@ -118,6 +114,12 @@ func getComprehensiveAnalysisResult(analysisData userRepository.AnalysisData) (s
 
 	自分史: 「
     ` + analysisData.UserHistoryString + `
+    」
+
+    以下のフォーマットに沿います。「**キャッチフレーズ**\n- 説明」の形式です。
+    
+    フォーマット例:「
+        **実験とリーダーシップの熱心な探求者**\n- 実験好きの特性は、新しいことへの挑戦と知識の追求を示しており、リーダーシップの特性は、チームを導き、目標達成に向けて取り組む力を表しています。また、計画性、積極性、コミュニケーション能力もこのフレーズに含まれており、あなたの多面的な資質を総合的に表現しています。
     」
 	`
 	return openaiutil.FetchOpenAIResponse(prompt)
@@ -140,9 +142,11 @@ func getComprehensiveAnalysisScore(comprehensiveAnalysisResult string, analysisD
     」
 
     これらの情報から、特性を抽出または新しく作成し、50～100点で点数化します。
-    特に点数が高いものから、必ず6つ表示してください。
+    点数が高いものから6つマークダウンで表示してください。
+	以下のフォーマットに沿ってください。フォーマットに含まれない情報は必要ありません。
+
     フォーマット例:「
-    - **責任感**: __50__\n- **リーダーシップ**: __70__\n- **努力家**: __95__\n- **実験好き**: __84__\n- **チームワーク**: __72__\n- **コミュニケーション能力**: __92__
+    - **責任感**: __50__ \n- **リーダーシップ**: __70__ \n- **努力家**: __95__ \n- **実験好き**: __84__ \n- **チームワーク**: __72__ \n- **コミュニケーション能力**: __92__
     」
   	`
 	return openaiutil.FetchOpenAIResponse(prompt)
