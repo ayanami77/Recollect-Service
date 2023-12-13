@@ -2,7 +2,6 @@ package user
 
 import (
 	"fmt"
-	userUsecase "github.com/Seiya-Tagami/Recollect-Service/api/usecase/user"
 	"github.com/go-playground/validator/v10"
 
 	"github.com/Seiya-Tagami/Recollect-Service/api/domain/entity"
@@ -94,10 +93,10 @@ func (r *Repository) ExistsByUserID(userID string) (bool, error) {
 	return count > 0, nil
 }
 
-func (r *Repository) GetAnalysisDataBySub(sub string) (userUsecase.AnalysisData, error) {
+func (r *Repository) GetAnalysisResultStringBySub(sub string) (user.AnalysisData, error) {
 	cards := []entity.Card{}
 	if err := r.db.Select("AnalysisResult").Find(&cards).Where("sub = ?", sub).Error; err != nil {
-		return userUsecase.AnalysisData{}, err
+		return user.AnalysisData{}, err
 	}
 
 	userHistoryString := ""
@@ -107,7 +106,7 @@ func (r *Repository) GetAnalysisDataBySub(sub string) (userUsecase.AnalysisData,
 		userHistoryString += card.Title + "\n" + card.Content + "\n"
 	}
 
-	analysisString := userUsecase.AnalysisData{
+	analysisString := user.AnalysisData{
 		UserHistoryString:    userHistoryString,
 		AnalysisResultString: analysisResultString,
 	}
