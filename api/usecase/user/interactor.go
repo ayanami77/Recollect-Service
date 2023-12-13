@@ -81,7 +81,7 @@ func (i *interactor) CheckUserIDDuplication(userID string) (bool, error) {
 }
 
 func (i *interactor) AnalyzeUserHistory(sub string) (entity.User, error) {
-	analysisData, err := i.userRepository.GetAnalysisResultStringBySub(sub)
+	analysisData, err := i.userRepository.GetAnalysisDataBySub(sub)
 	if err != nil {
 		return entity.User{}, myerror.InternalServerError
 	}
