@@ -113,7 +113,7 @@ func getComprehensiveAnalysisResult(analysisData userRepository.AnalysisData) (s
     」
 
 	自分史: 「
-    ` + analysisData.UserHistoryString + `
+    ` + analysisData.CardTitleString + `
     」
 
     以下のフォーマットに沿います。「**キャッチフレーズ**\n- 説明」の形式です。
@@ -138,7 +138,7 @@ func getComprehensiveAnalysisScore(comprehensiveAnalysisResult string, analysisD
     」
 
 	自分史: 「
-    ` + analysisData.UserHistoryString + `
+    ` + analysisData.CardTitleString + `
     」
 
     これらの情報から、特性を抽出または新しく作成し、50～100点で点数化します。

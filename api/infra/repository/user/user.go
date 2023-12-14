@@ -2,10 +2,10 @@ package user
 
 import (
 	"fmt"
-	"github.com/go-playground/validator/v10"
-
 	"github.com/Seiya-Tagami/Recollect-Service/api/domain/entity"
 	"github.com/Seiya-Tagami/Recollect-Service/api/domain/repository/user"
+	"github.com/go-playground/validator/v10"
+	"github.com/pkoukk/tiktoken-go"
 	"gorm.io/gorm"
 )
 
@@ -95,19 +95,47 @@ func (r *Repository) ExistsByUserID(userID string) (bool, error) {
 
 func (r *Repository) GetAnalysisDataBySub(sub string) (user.AnalysisData, error) {
 	cards := []entity.Card{}
-	if err := r.db.Select("AnalysisResult").Find(&cards).Where("sub = ?", sub).Error; err != nil {
+	if err := r.db.Select("Title", "AnalysisResult").Find(&cards).Where("sub = ?", sub).Error; err != nil {
 		return user.AnalysisData{}, err
 	}
 
-	userHistoryString := ""
+	availableTokens := 3700
+	cardTitleString := ""
 	analysisResultString := ""
-	for _, card := range cards {
-		analysisResultString += card.AnalysisResult + "\n"
-		userHistoryString += card.Title + "\n" + card.Content + "\n"
+
+	// token数取得の準備
+	encoding := "cl100k_base"
+	tkm, err := tiktoken.GetEncoding(encoding)
+	if err != nil {
+		err = fmt.Errorf("getEncoding: %v", err)
+		return user.AnalysisData{}, err
 	}
 
+	for _, card := range cards {
+		if len(tkm.Encode(cardTitleString, nil, nil)) >= 500 {
+			break
+		}
+		cardTitleString += card.Title + "\n"
+		fmt.Println(card)
+	}
+	fmt.Println(cardTitleString)
+	fmt.Printf("cardTitleString Token: %v\n", len(tkm.Encode(cardTitleString, nil, nil)))
+	availableTokens = availableTokens - len(tkm.Encode(cardTitleString, nil, nil))
+
+	for _, card := range cards {
+		// AnalysisResultを文字列に追加すると、利用可能トークンを超える場合、追加しない
+		if availableTokens-len(tkm.Encode(analysisResultString+card.AnalysisResult+"\n", nil, nil)) < 0 {
+			break
+		}
+		analysisResultString += card.AnalysisResult + "\n"
+		availableTokens -= len(tkm.Encode(analysisResultString, nil, nil))
+		fmt.Printf("analysisResultString Token: %v\n", len(tkm.Encode(analysisResultString, nil, nil)))
+	}
+
+	fmt.Println(availableTokens)
+
 	analysisString := user.AnalysisData{
-		UserHistoryString:    userHistoryString,
+		CardTitleString:      cardTitleString,
 		AnalysisResultString: analysisResultString,
 	}
 
