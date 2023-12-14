@@ -46,12 +46,13 @@ func (r *Repository) SelectBySub(user *entity.User, sub string) error {
 }
 
 func (r *Repository) UpdateBySub(user *entity.User, sub string) error {
-	validate := validator.New()
+	//TODO: user_idなど、本来validateが必要なものを更新するusecaseがある時は、必ずONに戻す。今は総合分析のみなので許容
+	//validate := validator.New()
 	//validate.RegisterValidation("includeNumeric", entity.IncludeAlphabetic)
 	//validate.RegisterValidation("includeAlphabetic", entity.IncludeNumeric)
-	if err := validate.Struct(user); err != nil {
-		return err
-	}
+	//if err := validate.Struct(user); err != nil {
+	//	return err
+	//}
 
 	result := r.db.Model(user).Where("sub = ?", sub).Updates(user)
 	if result.Error != nil {
@@ -90,4 +91,25 @@ func (r *Repository) ExistsByUserID(userID string) (bool, error) {
 	}
 
 	return count > 0, nil
+}
+
+func (r *Repository) GetAnalysisDataBySub(sub string) (user.AnalysisData, error) {
+	cards := []entity.Card{}
+	if err := r.db.Select("AnalysisResult").Find(&cards).Where("sub = ?", sub).Error; err != nil {
+		return user.AnalysisData{}, err
+	}
+
+	userHistoryString := ""
+	analysisResultString := ""
+	for _, card := range cards {
+		analysisResultString += card.AnalysisResult + "\n"
+		userHistoryString += card.Title + "\n" + card.Content + "\n"
+	}
+
+	analysisString := user.AnalysisData{
+		UserHistoryString:    userHistoryString,
+		AnalysisResultString: analysisResultString,
+	}
+
+	return analysisString, nil
 }

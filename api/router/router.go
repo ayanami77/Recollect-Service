@@ -23,6 +23,7 @@ func New(healthHandler health.Handler, userHandler user.Handler, cardHandler car
 		userRouter.POST("/signup", userHandler.CreateUser)
 		userRouter.POST("/email-duplicate-check", userHandler.CheckEmailDuplication)
 		userRouter.POST("/id-duplicate-check", userHandler.CheckUserIDDuplication)
+		userRouter.PATCH("/comprehensive-analysis", userHandler.AnalyzeUserHistory)
 	}
 
 	cardRouter := router.Group("/cards")
