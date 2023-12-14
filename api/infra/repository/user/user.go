@@ -7,6 +7,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/pkoukk/tiktoken-go"
 	"gorm.io/gorm"
+	"math/rand"
 )
 
 type Repository struct {
@@ -94,16 +95,28 @@ func (r *Repository) ExistsByUserID(userID string) (bool, error) {
 }
 
 func (r *Repository) GetAnalysisDataBySub(sub string) (user.AnalysisData, error) {
-	cards := []entity.Card{}
-	if err := r.db.Select("Title", "AnalysisResult").Find(&cards).Where("sub = ?", sub).Error; err != nil {
+	var cards []entity.Card
+	if err := r.db.Select("Title", "AnalysisResult").Where("sub = ?", sub).Find(&cards).Error; err != nil {
 		return user.AnalysisData{}, err
 	}
 
-	availableTokens := 3700
+	analysisData, err := generateAnalysisData(cards)
+	if err != nil {
+		return user.AnalysisData{}, err
+	}
+
+	return analysisData, nil
+}
+
+func generateAnalysisData(cards []entity.Card) (user.AnalysisData, error) {
+	// 入力と出力合わせて4Kトークンまで使用する(gpt-3.5-turbo-1106の上限は16K)
+	// 総合分析の各プロンプトは300、ComprehensiveAnalysisResultは1000、ComprehensiveAnalysisScoreは300で仮定すると
+	// 1600トークンが常に消費されると考え、バッファをもって設定
+	availableTokens := 2000
 	cardTitleString := ""
 	analysisResultString := ""
 
-	// token数取得の準備
+	// token数計算の準備
 	encoding := "cl100k_base"
 	tkm, err := tiktoken.GetEncoding(encoding)
 	if err != nil {
@@ -111,33 +124,25 @@ func (r *Repository) GetAnalysisDataBySub(sub string) (user.AnalysisData, error)
 		return user.AnalysisData{}, err
 	}
 
+	// 総合分析するカードの順番をランダム化
+	rand.Shuffle(len(cards), func(i, j int) { cards[i], cards[j] = cards[j], cards[i] })
+
 	for _, card := range cards {
-		if len(tkm.Encode(cardTitleString, nil, nil)) >= 500 {
+		// CardTitle・AnalysisResultを文字列に追加すると、利用可能トークンを超える場合、追加しない
+		appendStringTokens := len(tkm.Encode(card.Title+"\n"+card.AnalysisResult+"\n", nil, nil))
+		if availableTokens-appendStringTokens < 0 {
 			break
 		}
+
+		availableTokens -= appendStringTokens
 		cardTitleString += card.Title + "\n"
-		fmt.Println(card)
-	}
-	fmt.Println(cardTitleString)
-	fmt.Printf("cardTitleString Token: %v\n", len(tkm.Encode(cardTitleString, nil, nil)))
-	availableTokens = availableTokens - len(tkm.Encode(cardTitleString, nil, nil))
-
-	for _, card := range cards {
-		// AnalysisResultを文字列に追加すると、利用可能トークンを超える場合、追加しない
-		if availableTokens-len(tkm.Encode(analysisResultString+card.AnalysisResult+"\n", nil, nil)) < 0 {
-			break
-		}
 		analysisResultString += card.AnalysisResult + "\n"
-		availableTokens -= len(tkm.Encode(analysisResultString, nil, nil))
-		fmt.Printf("analysisResultString Token: %v\n", len(tkm.Encode(analysisResultString, nil, nil)))
 	}
 
-	fmt.Println(availableTokens)
-
-	analysisString := user.AnalysisData{
+	analysisData := user.AnalysisData{
 		CardTitleString:      cardTitleString,
 		AnalysisResultString: analysisResultString,
 	}
 
-	return analysisString, nil
+	return analysisData, nil
 }
