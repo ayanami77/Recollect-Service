@@ -118,7 +118,7 @@ func generateAnalysisData(cards []entity.Card) (user.AnalysisData, error) {
 
 	// token数計算の準備
 	encoding := "cl100k_base"
-	tkm, err := tiktoken.GetEncoding(encoding)
+	tke, err := tiktoken.GetEncoding(encoding)
 	if err != nil {
 		err = fmt.Errorf("getEncoding: %v", err)
 		return user.AnalysisData{}, err
@@ -129,7 +129,7 @@ func generateAnalysisData(cards []entity.Card) (user.AnalysisData, error) {
 
 	for _, card := range cards {
 		// CardTitle・AnalysisResultを文字列に追加すると、利用可能トークンを超える場合、追加しない
-		appendStringTokens := len(tkm.Encode(card.Title+"\n"+card.AnalysisResult+"\n", nil, nil))
+		appendStringTokens := len(tke.Encode(card.Title+"\n"+card.AnalysisResult+"\n", nil, nil))
 		if availableTokens-appendStringTokens < 0 {
 			break
 		}
