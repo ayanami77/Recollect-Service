@@ -99,6 +99,7 @@ func (i *interactor) AnalyzeUserHistory(sub string) (entity.User, error) {
 
 	user := entity.User{}
 
+	// プロンプトに不正な改行コードが含まれてしまう場合があるため、取り除く
 	user.ComprehensiveAnalysisResult = fixInvalidLF(comprehensiveAnalysisResult)
 	user.ComprehensiveAnalysisScore = comprehensiveAnalysisScore
 
