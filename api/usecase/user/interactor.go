@@ -5,6 +5,7 @@ import (
 	userRepository "github.com/Seiya-Tagami/Recollect-Service/api/domain/repository/user"
 	"github.com/Seiya-Tagami/Recollect-Service/api/handler/util/myerror"
 	"github.com/Seiya-Tagami/Recollect-Service/api/usecase/util/openaiutil"
+	"strings"
 )
 
 //go:generate mockgen -source=$GOFILE -destination=$GOPATH/Recollect-Service/api/mock/$GOPACKAGE/$GOFILE -package=mock_$GOPACKAGE
@@ -98,10 +99,20 @@ func (i *interactor) AnalyzeUserHistory(sub string) (entity.User, error) {
 
 	user := entity.User{}
 
-	user.ComprehensiveAnalysisResult = comprehensiveAnalysisResult
+	user.ComprehensiveAnalysisResult = fixInvalidLF(comprehensiveAnalysisResult)
 	user.ComprehensiveAnalysisScore = comprehensiveAnalysisScore
 
 	return i.UpdateUser(user, sub)
+}
+
+func fixInvalidLF(text string) string {
+	// "\n\n"が含まれてしまう場合
+	text = strings.ReplaceAll(text, "\n\n", "\n")
+
+	// "\\n"が含まれてしまう場合
+	text = strings.ReplaceAll(text, "\\n", "\n")
+
+	return text
 }
 
 func getComprehensiveAnalysisResult(analysisData userRepository.AnalysisData) (string, error) {
