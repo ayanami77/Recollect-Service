@@ -5,6 +5,7 @@ import (
 	userRepository "github.com/Seiya-Tagami/Recollect-Service/api/domain/repository/user"
 	"github.com/Seiya-Tagami/Recollect-Service/api/handler/util/myerror"
 	"github.com/Seiya-Tagami/Recollect-Service/api/usecase/util/openaiutil"
+	"strings"
 )
 
 //go:generate mockgen -source=$GOFILE -destination=$GOPATH/Recollect-Service/api/mock/$GOPACKAGE/$GOFILE -package=mock_$GOPACKAGE
@@ -98,10 +99,21 @@ func (i *interactor) AnalyzeUserHistory(sub string) (entity.User, error) {
 
 	user := entity.User{}
 
-	user.ComprehensiveAnalysisResult = comprehensiveAnalysisResult
+	// プロンプトに不正な改行コードが含まれてしまう場合があるため、取り除く
+	user.ComprehensiveAnalysisResult = fixInvalidLF(comprehensiveAnalysisResult)
 	user.ComprehensiveAnalysisScore = comprehensiveAnalysisScore
 
 	return i.UpdateUser(user, sub)
+}
+
+func fixInvalidLF(text string) string {
+	// "\n\n"が含まれてしまう場合
+	text = strings.ReplaceAll(text, "\n\n", "\n")
+
+	// "\\n"が含まれてしまう場合
+	text = strings.ReplaceAll(text, "\\n", "\n")
+
+	return text
 }
 
 func getComprehensiveAnalysisResult(analysisData userRepository.AnalysisData) (string, error) {
@@ -113,10 +125,10 @@ func getComprehensiveAnalysisResult(analysisData userRepository.AnalysisData) (s
     」
 
 	自分史: 「
-    ` + analysisData.UserHistoryString + `
+    ` + analysisData.CardTitleString + `
     」
 
-    以下のフォーマットに沿います。「**キャッチフレーズ**\n- 説明」の形式です。
+    以下のフォーマットに沿います。「**キャッチフレーズ**\n- 説明」の形式です。\nはエスケープしません。
     
     フォーマット例:「
         **実験とリーダーシップの熱心な探求者**\n- 実験好きの特性は、新しいことへの挑戦と知識の追求を示しており、リーダーシップの特性は、チームを導き、目標達成に向けて取り組む力を表しています。また、計画性、積極性、コミュニケーション能力もこのフレーズに含まれており、あなたの多面的な資質を総合的に表現しています。
@@ -138,7 +150,7 @@ func getComprehensiveAnalysisScore(comprehensiveAnalysisResult string, analysisD
     」
 
 	自分史: 「
-    ` + analysisData.UserHistoryString + `
+    ` + analysisData.CardTitleString + `
     」
 
     これらの情報から、特性を抽出または新しく作成し、50～100点で点数化します。

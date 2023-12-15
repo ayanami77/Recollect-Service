@@ -2,11 +2,12 @@ package user
 
 import (
 	"fmt"
-	"github.com/go-playground/validator/v10"
-
 	"github.com/Seiya-Tagami/Recollect-Service/api/domain/entity"
 	"github.com/Seiya-Tagami/Recollect-Service/api/domain/repository/user"
+	"github.com/go-playground/validator/v10"
+	"github.com/pkoukk/tiktoken-go"
 	"gorm.io/gorm"
+	"math/rand"
 )
 
 type Repository struct {
@@ -94,22 +95,54 @@ func (r *Repository) ExistsByUserID(userID string) (bool, error) {
 }
 
 func (r *Repository) GetAnalysisDataBySub(sub string) (user.AnalysisData, error) {
-	cards := []entity.Card{}
-	if err := r.db.Select("AnalysisResult").Find(&cards).Where("sub = ?", sub).Error; err != nil {
+	var cards []entity.Card
+	if err := r.db.Select("Title", "AnalysisResult").Where("sub = ?", sub).Find(&cards).Error; err != nil {
 		return user.AnalysisData{}, err
 	}
 
-	userHistoryString := ""
-	analysisResultString := ""
-	for _, card := range cards {
-		analysisResultString += card.AnalysisResult + "\n"
-		userHistoryString += card.Title + "\n" + card.Content + "\n"
+	analysisData, err := generateAnalysisData(cards)
+	if err != nil {
+		return user.AnalysisData{}, err
 	}
 
-	analysisString := user.AnalysisData{
-		UserHistoryString:    userHistoryString,
+	return analysisData, nil
+}
+
+func generateAnalysisData(cards []entity.Card) (user.AnalysisData, error) {
+	// 入力と出力合わせて4Kトークンまで使用する(gpt-3.5-turbo-1106の上限は16K)
+	// 総合分析の各プロンプトは300、ComprehensiveAnalysisResultは1000、ComprehensiveAnalysisScoreは300で仮定すると
+	// 1600トークンが常に消費されると考え、バッファをもって設定
+	availableTokens := 2000
+	cardTitleString := ""
+	analysisResultString := ""
+
+	// token数計算の準備
+	encoding := "cl100k_base"
+	tke, err := tiktoken.GetEncoding(encoding)
+	if err != nil {
+		err = fmt.Errorf("getEncoding: %v", err)
+		return user.AnalysisData{}, err
+	}
+
+	// 総合分析するカードの順番をランダム化
+	rand.Shuffle(len(cards), func(i, j int) { cards[i], cards[j] = cards[j], cards[i] })
+
+	for _, card := range cards {
+		// CardTitle・AnalysisResultを文字列に追加すると、利用可能トークンを超える場合、追加しない
+		appendStringTokens := len(tke.Encode(card.Title+"\n"+card.AnalysisResult+"\n", nil, nil))
+		if availableTokens-appendStringTokens < 0 {
+			break
+		}
+
+		availableTokens -= appendStringTokens
+		cardTitleString += card.Title + "\n"
+		analysisResultString += card.AnalysisResult + "\n"
+	}
+
+	analysisData := user.AnalysisData{
+		CardTitleString:      cardTitleString,
 		AnalysisResultString: analysisResultString,
 	}
 
-	return analysisString, nil
+	return analysisData, nil
 }

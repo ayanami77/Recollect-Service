@@ -14,6 +14,6 @@ type Repository interface {
 }
 
 type AnalysisData struct {
-	UserHistoryString    string
+	CardTitleString      string
 	AnalysisResultString string
 }
