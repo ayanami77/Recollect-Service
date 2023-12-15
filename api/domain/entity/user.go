@@ -7,14 +7,16 @@ import (
 )
 
 type User struct {
-	Sub       string    `json:"sub" gorm:"primaryKey"` //Google OAuthの識別子
-	UserID    string    `json:"user_id" gorm:"unique;not null" validate:"required,min=3,max=20,alphanumunicode"`
-	UserName  string    `json:"user_name" gorm:"not null"`
-	Email     string    `json:"email" gorm:"unique;not null" validate:"required,email"`
-	CreatedAt time.Time `json:"created_at" gorm:"not null"`
-	UpdatedAt time.Time `json:"updated_at" gorm:"not null"`
-	DeletedAt time.Time `json:"deleted_at" gorm:""`
-	Cards     []Card    `json:"cards" gorm:"foreignKey:Sub;references:Sub"`
+	Sub                         string    `json:"sub" gorm:"primaryKey"` //Google OAuthの識別子
+	UserID                      string    `json:"user_id" gorm:"unique;not null" validate:"required,min=3,max=20,alphanumunicode"`
+	UserName                    string    `json:"user_name" gorm:"not null"`
+	Email                       string    `json:"email" gorm:"unique;not null" validate:"required,email"`
+	ComprehensiveAnalysisResult string    `json:"comprehensive_analysis_result"`
+	ComprehensiveAnalysisScore  string    `json:"comprehensive_analysis_score"`
+	CreatedAt                   time.Time `json:"created_at" gorm:"not null"`
+	UpdatedAt                   time.Time `json:"updated_at" gorm:"not null"`
+	DeletedAt                   time.Time `json:"deleted_at" gorm:""`
+	Cards                       []Card    `json:"cards" gorm:"foreignKey:Sub;references:Sub"`
 }
 
 // TODO
